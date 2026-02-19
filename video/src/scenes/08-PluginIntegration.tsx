@@ -27,7 +27,7 @@ export const PluginIntegration: React.FC = () => {
   return (
     <SceneContainer sceneIndex={7}>
       {/* Title */}
-      <Sequence durationInFrames={1050} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={940} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="Plugin Integration"
@@ -38,7 +38,7 @@ export const PluginIntegration: React.FC = () => {
       </Sequence>
 
       {/* Parameter flow diagram */}
-      <Sequence from={60} durationInFrames={500} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={423} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -54,7 +54,7 @@ export const PluginIntegration: React.FC = () => {
               { label: "Voices", color: COLORS.GREEN, desc: "per-voice copy" },
             ].map((block, i) => {
               const blockReveal = spring({
-                frame: frame - 60 - i * 20,
+                frame: frame - i * 20,
                 fps,
                 config: SPRING_SMOOTH,
               });
@@ -67,7 +67,7 @@ export const PluginIntegration: React.FC = () => {
                         fontFamily: FONT_MONO,
                         fontSize: 24,
                         color: COLORS.TEXT_DIM,
-                        opacity: interpolate(frame - 60, [i * 20, i * 20 + 15], [0, 0.6], {
+                        opacity: interpolate(frame, [i * 20, i * 20 + 15], [0, 0.6], {
                           extrapolateLeft: "clamp",
                           extrapolateRight: "clamp",
                         }),
@@ -121,7 +121,7 @@ export const PluginIntegration: React.FC = () => {
       </Sequence>
 
       {/* processBlock code */}
-      <Sequence from={450} durationInFrames={600} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={423} durationInFrames={517} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock

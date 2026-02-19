@@ -24,7 +24,7 @@ export const Envelope: React.FC = () => {
   return (
     <SceneContainer sceneIndex={4}>
       {/* Title */}
-      <Sequence durationInFrames={1800} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1735} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="ADSR Envelope"
@@ -35,7 +35,7 @@ export const Envelope: React.FC = () => {
       </Sequence>
 
       {/* ADSR visualization */}
-      <Sequence from={60} durationInFrames={700} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={500} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "200px 80px",
@@ -66,7 +66,7 @@ export const Envelope: React.FC = () => {
                 key={i}
                 style={{
                   textAlign: "center",
-                  opacity: interpolate(frame - 60, [i * 35, i * 35 + 20], [0, 1], {
+                  opacity: interpolate(frame, [i * 35, i * 35 + 20], [0, 1], {
                     extrapolateLeft: "clamp",
                     extrapolateRight: "clamp",
                   }),
@@ -99,7 +99,7 @@ export const Envelope: React.FC = () => {
       </Sequence>
 
       {/* Overshoot trick explanation */}
-      <Sequence from={600} durationInFrames={400} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={500} durationInFrames={673} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "200px 80px",
@@ -143,7 +143,7 @@ export const Envelope: React.FC = () => {
                 fontSize: 16,
                 color: COLORS.TEXT_PRIMARY,
                 lineHeight: 2.2,
-                opacity: interpolate(frame - 600, [20, 40], [0, 1], {
+                opacity: interpolate(frame - 500, [20, 40], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -170,7 +170,7 @@ export const Envelope: React.FC = () => {
       </Sequence>
 
       {/* Envelope code */}
-      <Sequence from={950} durationInFrames={850} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={1173} durationInFrames={562} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 720 }}>
             <CodeBlock

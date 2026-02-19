@@ -6,8 +6,8 @@ import {
   useCurrentFrame,
 } from "remotion";
 import { COLORS } from "../lib/colors";
-import { FONT_SANS, FONT_MONO } from "../lib/fonts";
-import { PREMOUNT_FRAMES, STAGGER_OFFSET } from "../lib/timing";
+import { FONT_SANS } from "../lib/fonts";
+import { PREMOUNT_FRAMES } from "../lib/timing";
 import { SceneContainer } from "../components/SceneContainer";
 import { SectionTitle } from "../components/SectionTitle";
 import { CodeBlock } from "../components/CodeBlock";
@@ -38,7 +38,7 @@ export const Synth: React.FC = () => {
   return (
     <SceneContainer sceneIndex={6}>
       {/* Title */}
-      <Sequence durationInFrames={1650} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1270} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="8-Voice Polyphonic Synth"
@@ -49,7 +49,7 @@ export const Synth: React.FC = () => {
       </Sequence>
 
       {/* Voice grid animation */}
-      <Sequence from={60} durationInFrames={600} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={851} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "200px 80px",
@@ -65,7 +65,7 @@ export const Synth: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 16,
-                opacity: interpolate(frame - 60, [0, 15], [0, 1], {
+                opacity: interpolate(frame, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -104,7 +104,7 @@ export const Synth: React.FC = () => {
       </Sequence>
 
       {/* Synth code */}
-      <Sequence from={600} durationInFrames={650} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={851} durationInFrames={419} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock
@@ -118,53 +118,6 @@ export const Synth: React.FC = () => {
         </AbsoluteFill>
       </Sequence>
 
-      {/* Poly modes teaser */}
-      <Sequence from={1200} durationInFrames={450} premountFor={PREMOUNT_FRAMES}>
-        <AbsoluteFill
-          style={{
-            padding: "200px 80px",
-            justifyContent: "flex-start",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: FONT_SANS,
-              fontSize: 24,
-              color: COLORS.TEXT_DIM,
-              marginBottom: 30,
-              opacity: interpolate(frame - 1200, [0, 20], [0, 1], {
-                extrapolateLeft: "clamp",
-                extrapolateRight: "clamp",
-              }),
-            }}
-          >
-            Play Modes (coming in Phase 2)
-          </div>
-          <div style={{ display: "flex", gap: 24 }}>
-            {["Poly", "Mono", "Unison", "Stereo"].map((mode, i) => (
-              <NeonBox
-                key={mode}
-                color={i === 0 ? COLORS.CYAN : COLORS.TEXT_DIM}
-                delay={i * 15}
-                width={180}
-              >
-                <div
-                  style={{
-                    fontFamily: FONT_SANS,
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: i === 0 ? COLORS.CYAN : COLORS.TEXT_DIM,
-                    textAlign: "center",
-                  }}
-                >
-                  {mode}
-                </div>
-              </NeonBox>
-            ))}
-          </div>
-        </AbsoluteFill>
-      </Sequence>
       <SceneNarration segments={NARRATION[6].segments} />
     </SceneContainer>
   );

@@ -24,7 +24,7 @@ export const Oscillator: React.FC = () => {
   return (
     <SceneContainer sceneIndex={3}>
       {/* Title */}
-      <Sequence durationInFrames={2100} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1815} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="The Oscillator"
@@ -35,7 +35,7 @@ export const Oscillator: React.FC = () => {
       </Sequence>
 
       {/* Naive saw - the problem */}
-      <Sequence from={60} durationInFrames={600} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={500} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -52,7 +52,7 @@ export const Oscillator: React.FC = () => {
                 fontWeight: 600,
                 color: COLORS.PINK,
                 marginBottom: 16,
-                opacity: interpolate(frame - 60, [0, 15], [0, 1], {
+                opacity: interpolate(frame, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -91,7 +91,7 @@ export const Oscillator: React.FC = () => {
       </Sequence>
 
       {/* PolyBLEP explanation */}
-      <Sequence from={550} durationInFrames={600} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={500} durationInFrames={549} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div
             style={{
@@ -100,7 +100,7 @@ export const Oscillator: React.FC = () => {
               fontWeight: 600,
               color: COLORS.GREEN,
               marginBottom: 20,
-              opacity: interpolate(frame - 550, [0, 15], [0, 1], {
+              opacity: interpolate(frame - 500, [0, 15], [0, 1], {
                 extrapolateLeft: "clamp",
                 extrapolateRight: "clamp",
               }),
@@ -129,7 +129,7 @@ export const Oscillator: React.FC = () => {
       </Sequence>
 
       {/* PolyBLEP code */}
-      <Sequence from={1000} durationInFrames={700} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={1049} durationInFrames={458} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock
@@ -144,7 +144,7 @@ export const Oscillator: React.FC = () => {
       </Sequence>
 
       {/* Before/After comparison */}
-      <Sequence from={1650} durationInFrames={450} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={1507} durationInFrames={308} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -160,7 +160,7 @@ export const Oscillator: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.PINK,
                 marginBottom: 12,
-                opacity: interpolate(frame - 1650, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 1507, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -185,7 +185,7 @@ export const Oscillator: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.GREEN,
                 marginBottom: 12,
-                opacity: interpolate(frame - 1650, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 1507, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),

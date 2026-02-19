@@ -24,7 +24,7 @@ export const Voice: React.FC = () => {
   return (
     <SceneContainer sceneIndex={5}>
       {/* Title */}
-      <Sequence durationInFrames={1500} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1200} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="The Voice"
@@ -35,7 +35,7 @@ export const Voice: React.FC = () => {
       </Sequence>
 
       {/* Signal chain diagram */}
-      <Sequence from={60} durationInFrames={500} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={428} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "160px 40px",
@@ -52,7 +52,7 @@ export const Voice: React.FC = () => {
       </Sequence>
 
       {/* MIDI to frequency */}
-      <Sequence from={450} durationInFrames={400} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={428} durationInFrames={343} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "210px 80px" }}>
           <NeonBox color={COLORS.VIOLET} delay={0} width={700}>
             <div
@@ -96,7 +96,7 @@ export const Voice: React.FC = () => {
       </Sequence>
 
       {/* Voice code */}
-      <Sequence from={750} durationInFrames={750} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={771} durationInFrames={429} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock

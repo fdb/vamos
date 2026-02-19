@@ -24,7 +24,7 @@ export const Phasor: React.FC = () => {
   return (
     <SceneContainer sceneIndex={2}>
       {/* Title */}
-      <Sequence durationInFrames={1650} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1190} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="The Phasor"
@@ -35,7 +35,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Phase ramp visualization */}
-      <Sequence from={60} durationInFrames={500} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={398} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -51,7 +51,7 @@ export const Phasor: React.FC = () => {
                 fontSize: 22,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 16,
-                opacity: interpolate(frame - 60, [0, 20], [0, 1], {
+                opacity: interpolate(frame, [0, 20], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -108,7 +108,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Code walkthrough */}
-      <Sequence from={500} durationInFrames={700} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={398} durationInFrames={340} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock
@@ -123,7 +123,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Waveform from phasor */}
-      <Sequence from={1100} durationInFrames={550} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={738} durationInFrames={452} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -139,7 +139,7 @@ export const Phasor: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 12,
-                opacity: interpolate(frame - 1100, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 738, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -163,7 +163,7 @@ export const Phasor: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 12,
-                opacity: interpolate(frame - 1100, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 738, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),

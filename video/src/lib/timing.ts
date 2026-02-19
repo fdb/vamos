@@ -2,17 +2,17 @@ export const FPS = 30;
 export const WIDTH = 1920;
 export const HEIGHT = 1080;
 
-// Scene durations in frames
+// Scene durations in frames — driven by narration audio lengths
 export const SCENE_DURATIONS = {
-  INTRO: 1050, // 35s
-  PROJECT_SETUP: 1500, // 50s
-  PHASOR: 1650, // 55s
-  OSCILLATOR: 2100, // 70s
-  ENVELOPE: 1800, // 60s
-  VOICE: 1500, // 50s
-  SYNTH: 1650, // 55s
-  PLUGIN: 1050, // 35s
-  OUTRO: 300, // 10s
+  INTRO: 1170, // 39s
+  PROJECT_SETUP: 1280, // 42.7s
+  PHASOR: 1190, // 39.7s
+  OSCILLATOR: 1815, // 60.5s
+  ENVELOPE: 1735, // 57.8s
+  VOICE: 1200, // 40s
+  SYNTH: 1270, // 42.3s
+  PLUGIN: 940, // 31.3s
+  OUTRO: 500, // 16.7s
 } as const;
 
 export const TRANSITION_DURATION = 15;

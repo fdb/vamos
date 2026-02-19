@@ -72,6 +72,34 @@ Two test executables with different dependency profiles:
 
 Both use Catch2 v3.5.2 and are registered with CTest via `catch_discover_tests()`.
 
+## Video Series
+
+Educational video series in `video/` built with Remotion 4.0 (React-based video rendering). Each episode covers a development phase of the synth. Target audience: synth enthusiasts with some programming background but not deep DSP/audio coding experience.
+
+### Video Commands
+
+```bash
+cd video && npm install              # Install dependencies
+npx remotion studio                  # Open Remotion Studio for preview
+npx remotion render Video --output=out/episode.mp4  # Render final video
+```
+
+### Video Structure
+
+- `video/src/scenes/` — One file per scene (01-Intro through 09-Outro)
+- `video/src/components/` — Reusable visual components (CodeBlock, WaveformVisualizer, ADSRVisualizer, SignalFlowDiagram, VoiceGrid, etc.)
+- `video/src/lib/` — Colors, fonts, timing, narration text, code snippets, syntax highlighting
+- `video/public/voiceover/` — ElevenLabs TTS MP3 files (gitignored, regenerated via `npx tsx generate-voiceover.ts`)
+
+### Key Conventions
+
+- **Audio-driven timing**: Narration audio lengths determine scene/section durations. Each visual section starts when its narration segment starts.
+- **No CSS transitions**: All animations use `useCurrentFrame()` + `interpolate()` or `spring()`.
+- **All Sequences get `premountFor={30}`** to prevent stuttering.
+- **Dark synthwave aesthetic**: Background #0a0a0a, primary accent #00E5FF (cyan), matching the Vamos plugin UI.
+
+See `video/WORKFLOW.md` for the full episode production workflow.
+
 ## Phase Documentation
 
 Detailed design documents in `docs/` (phases 1–7) cover architectural decisions, Drift equivalence notes, and implementation rationale for each development phase.
