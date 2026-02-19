@@ -26,7 +26,7 @@ export const ProjectSetup: React.FC = () => {
   return (
     <SceneContainer sceneIndex={1}>
       {/* Title */}
-      <Sequence durationInFrames={1552} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1770} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="Project Setup"
@@ -37,7 +37,7 @@ export const ProjectSetup: React.FC = () => {
       </Sequence>
 
       {/* CMake FetchContent code */}
-      <Sequence from={0} durationInFrames={451} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={669} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 800 }}>
             <CodeBlock
@@ -56,7 +56,7 @@ export const ProjectSetup: React.FC = () => {
       </Sequence>
 
       {/* Plugin target */}
-      <Sequence from={451} durationInFrames={396} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={669} durationInFrames={396} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 800 }}>
             <CodeBlock
@@ -75,7 +75,7 @@ export const ProjectSetup: React.FC = () => {
       </Sequence>
 
       {/* File tree + Two-layer architecture */}
-      <Sequence from={847} durationInFrames={705} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={1065} durationInFrames={705} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "200px 80px",
@@ -91,7 +91,7 @@ export const ProjectSetup: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 16,
-                opacity: interpolate(frame - 847, [0, 20], [0, 1], {
+                opacity: interpolate(frame - 1065, [0, 20], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -113,7 +113,7 @@ export const ProjectSetup: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 16,
-                opacity: interpolate(frame - 847, [0, 20], [0, 1], {
+                opacity: interpolate(frame - 1065, [0, 20], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),

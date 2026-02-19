@@ -24,11 +24,11 @@ export const PluginIntegration: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Placeholder durations — will be updated after audio generation
-  const SCENE_TOTAL = 2712;
-  const SEG0_END = 517;
-  const SEG1_END = 1206;
-  const SEG2_END = 1780;
+  // Durations derived from narration audio lengths
+  const SCENE_TOTAL = 2844;
+  const SEG0_END = 649;
+  const SEG1_END = 1338;
+  const SEG2_END = 1912;
 
   return (
     <SceneContainer sceneIndex={7}>

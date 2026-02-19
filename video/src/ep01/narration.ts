@@ -31,18 +31,18 @@ export const NARRATION: SceneNarration[] = [
     segments: [
       {
         id: "02-project-setup-0",
-        text: "First, the build system. We use CMake with FetchContent to pull in JUCE directly from its Git repository. This avoids the complexity of managing git submodules or downloading frameworks by hand — CMake handles it all in one configure step.",
-        startFrame: 0, // 14.0s = 421 frames
+        text: "Before we write any audio code, we need a project structure that can produce VST3, Audio Unit, and standalone builds from the same codebase. We use CMake with FetchContent to pull in JUCE directly from its Git repository. This avoids the complexity of managing git submodules or downloading frameworks by hand — CMake handles it all in one configure step.",
+        startFrame: 0, // 21.3s = 639 frames
       },
       {
         id: "02-project-setup-1",
         text: "Our plugin targets three formats at once: VST3, Audio Unit, and Standalone. JUCE wraps the platform-specific details — we just focus on writing the audio code, and JUCE makes sure it runs everywhere.",
-        startFrame: 451, // prevAudio + 30 gap
+        startFrame: 669, // prevAudio + 30 gap
       },
       {
         id: "02-project-setup-2",
         text: "One important architectural decision: we separate the project into two layers. The DSP layer is pure C++ with zero JUCE dependencies. This means we can test oscillators, envelopes, and filters independently, without booting up the full plugin framework. The plugin layer then wires our DSP code to JUCE's AudioProcessor for audio handling and its component system for the GUI.",
-        startFrame: 847, // prevAudio + 30 gap
+        startFrame: 1065, // prevAudio + 30 gap
       },
     ],
   },
@@ -51,18 +51,18 @@ export const NARRATION: SceneNarration[] = [
     segments: [
       {
         id: "03-phasor-0",
-        text: "Every oscillator starts with a phasor — a phase accumulator that ramps from zero to one, then wraps around. Think of it as a clock that keeps ticking at a specific frequency. The speed is simply the frequency divided by the sample rate.",
-        startFrame: 0, // 12.1s = 364 frames
+        text: "To generate any waveform — sine, saw, square — we need a single core mechanism. It's called a phasor: a phase accumulator that ramps from zero to one, then wraps around. Think of it as a clock that keeps ticking at a specific frequency. The speed is simply the frequency divided by the sample rate.",
+        startFrame: 0, // 18.4s = 552 frames
       },
       {
         id: "03-phasor-1",
         text: "The code is quite elegant. Each call to next advances the phase by the increment. When it passes one, we subtract — creating an endlessly repeating ramp. That's the entire engine.",
-        startFrame: 394, // prevAudio + 30 gap
+        startFrame: 582, // prevAudio + 30 gap
       },
       {
         id: "03-phasor-2",
         text: "From this single ramp, we derive every waveform. Multiply by two and subtract one — you get a sawtooth. Pass it through a sine function — you get a sine wave. The phasor is the master clock for all of them.",
-        startFrame: 681, // prevAudio + 30 gap
+        startFrame: 869, // prevAudio + 30 gap
       },
     ],
   },
@@ -71,28 +71,28 @@ export const NARRATION: SceneNarration[] = [
     segments: [
       {
         id: "04-oscillator-0",
-        text: "But there's a problem with these simple waveforms. A raw sawtooth has a hard jump at the wrap point — an instantaneous leap from plus one to minus one. In the digital world, this sharp edge creates frequencies above what our sample rate can represent. Those frequencies fold back and appear as unwanted noise — this is called aliasing.",
-        startFrame: 0, // 18.9s = 566 frames
+        text: "We have basic waveforms, but they don't sound clean yet — in this section, we'll fix that. A raw sawtooth has a hard jump at the wrap point — an instantaneous leap from plus one to minus one. In the digital world, this sharp edge creates frequencies above what our sample rate can represent. Those frequencies fold back and appear as unwanted noise — this is called aliasing.",
+        startFrame: 0, // 21.5s = 644 frames
       },
       {
         id: "04-oscillator-1",
         text: "The fix is called PolyBLEP — which stands for Polynomial Band-Limited Step. The idea is straightforward: instead of that hard jump, we gently round off the edges. Near the discontinuity, we apply a small correction that smooths the transition — like sanding down a sharp corner. The computational cost? Just two extra multiplications per sample. The result? A clean waveform without the aliasing artifacts.",
-        startFrame: 596, // prevAudio + 30 gap
+        startFrame: 674, // prevAudio + 30 gap
       },
       {
         id: "04-oscillator-2",
         text: "Here's the implementation. The polyBLEP function checks if we're near the wrap point — within one sample of the discontinuity — and applies the correction. The saw function generates the raw value, then subtracts the PolyBLEP correction to get a clean output.",
-        startFrame: 1440, // prevAudio + 30 gap
+        startFrame: 1518, // prevAudio + 30 gap
       },
       {
         id: "04-oscillator-3",
         text: "Let's look at the difference. On the left, the naive sawtooth and its frequency spectrum — you can see energy spreading into higher frequencies where it shouldn't be. That's the aliasing. On the right, with PolyBLEP applied, the spectrum rolls off cleanly. The harmonics stay where they belong.",
-        startFrame: 1886, // prevAudio + 30 gap
+        startFrame: 1964, // prevAudio + 30 gap
       },
       {
         id: "04-oscillator-4",
         text: "So now we have clean waveforms — but a tone that just drones on forever isn't very musical. We need a way to shape the sound over time: give it a punchy start, let it settle, and fade away when we release the key. That's exactly what an envelope does, and it's our next building block.",
-        startFrame: 2401, // prevAudio + 30 gap
+        startFrame: 2479, // prevAudio + 30 gap
       },
     ],
   },
@@ -121,18 +121,18 @@ export const NARRATION: SceneNarration[] = [
     segments: [
       {
         id: "06-voice-0",
-        text: "A voice wires everything together — two oscillators, a filter, and the amplitude envelope — into a single signal chain. When a MIDI note arrives, we convert it to a frequency using the standard equal-temperament formula.",
-        startFrame: 0, // 13.0s = 392 frames
+        text: "We have individual building blocks — oscillators and an envelope — but they're not connected yet. A voice wires them into a single signal chain, from MIDI note to audio output. By the end of this section, we'll be able to play one note from start to finish.",
+        startFrame: 0, // 13.7s = 413 frames
       },
       {
         id: "06-voice-1",
         text: "MIDI note sixty-nine is A-four at four-forty hertz. Each semitone multiplies the frequency by two to the power of one-twelfth. This single formula gives us the entire piano range.",
-        startFrame: 422, // prevAudio + 30 gap
+        startFrame: 443, // prevAudio + 30 gap
       },
       {
         id: "06-voice-2",
-        text: "The voice's process function is the per-sample signal chain. Mix the oscillators, run through the filter, multiply by the envelope. Nothing fancy — the mixer literally just adds the signals together. In later episodes, we'll add modulation and more complex routing, but for now, simplicity is the point.",
-        startFrame: 788, // prevAudio + 30 gap
+        text: "The voice's process function is the per-sample signal chain. Mix the oscillators, run through the filter, multiply by the envelope. Nothing fancy — the mixer literally just adds the signals together. In later episodes, we'll add modulation and more complex routing, but for now, simplicity is the point. We can play one note — but a synth needs to play chords, and that means managing multiple voices at once.",
+        startFrame: 809, // prevAudio + 30 gap
       },
     ],
   },
@@ -161,23 +161,23 @@ export const NARRATION: SceneNarration[] = [
     segments: [
       {
         id: "08-plugin-0",
-        text: "Now we connect our DSP engine to the actual plugin. JUCE's AudioProcessor is the entry point — it's what your DAW talks to. It handles the audio callback, MIDI input, and plugin state. Our job is to bridge between JUCE's world and our clean DSP code.",
-        startFrame: 0, // 16.2s = 487 frames
+        text: "Everything we've built so far is pure DSP code — no plugin, no DAW, no knobs. By the end of this section, we'll have a working VST3 and Audio Unit plugin with over thirty automatable parameters. The bridge is JUCE's AudioProcessor — it's what your DAW talks to. It handles the audio callback, MIDI input, and plugin state.",
+        startFrame: 0, // 20.6s = 619 frames
       },
       {
         id: "08-plugin-1",
         text: "JUCE provides a parameter system called the Audio Processor Value Tree State — or APVTS for short. It manages over thirty parameters: oscillator types, filter settings, envelope times, and more. Each parameter has a name, a range, and a default value. JUCE handles saving and loading these automatically, and exposes them to the DAW for automation.",
-        startFrame: 517, // prevAudio + 30 gap
+        startFrame: 649, // prevAudio + 30 gap
       },
       {
         id: "08-plugin-2",
         text: "Every time the DAW calls processBlock, we read all parameter values from the APVTS, pack them into our own SynthParams struct, and pass that to the synth engine. This is the bridge between JUCE's parameter tree and our pure DSP code. The synth then distributes these parameters to each active voice.",
-        startFrame: 1206, // prevAudio + 30 gap
+        startFrame: 1338, // prevAudio + 30 gap
       },
       {
         id: "08-plugin-3",
         text: "Four critical parameters — volume, filter frequency, and the two oscillator gains — use something called SmoothedValue. Without smoothing, when you move a knob, the value would jump instantly from, say, zero-point-five to zero-point-eight. That instant jump creates an audible click — like a tiny discontinuity in the audio signal. SmoothedValue ramps gradually instead, spreading the change over a few milliseconds. It's a small detail, but it makes the difference between a prototype and a polished instrument.",
-        startFrame: 1780, // prevAudio + 30 gap
+        startFrame: 1912, // prevAudio + 30 gap
       },
     ],
   },

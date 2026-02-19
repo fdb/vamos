@@ -2,13 +2,13 @@
 
 export const SCENE_DURATIONS = {
   INTRO: 1368, // 45.6s
-  PROJECT_SETUP: 1552, // 51.7s
-  PHASOR: 1036, // 34.5s
-  OSCILLATOR: 2877, // 95.9s
+  PROJECT_SETUP: 1770, // 59.0s
+  PHASOR: 1224, // 40.8s
+  OSCILLATOR: 2955, // 98.5s
   ENVELOPE: 1747, // 58.2s
-  VOICE: 1330, // 44.3s
+  VOICE: 1514, // 50.5s
   SYNTH: 1235, // 41.2s
-  PLUGIN: 2712, // 90.4s
+  PLUGIN: 2844, // 94.8s
   OUTRO: 754, // 25.1s
 } as const;
 

@@ -22,12 +22,12 @@ import { NARRATION } from "../narration";
 export const Oscillator: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // Placeholder durations — will be updated after audio generation
-  const SCENE_TOTAL = 2877;
-  const SEG0_END = 596;
-  const SEG1_END = 1440;
-  const SEG2_END = 1886;
-  const SEG3_END = 2401;
+  // Durations derived from narration audio lengths
+  const SCENE_TOTAL = 2955;
+  const SEG0_END = 674;
+  const SEG1_END = 1518;
+  const SEG2_END = 1964;
+  const SEG3_END = 2479;
 
   return (
     <SceneContainer sceneIndex={3}>

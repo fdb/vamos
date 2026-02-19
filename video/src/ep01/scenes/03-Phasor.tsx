@@ -24,7 +24,7 @@ export const Phasor: React.FC = () => {
   return (
     <SceneContainer sceneIndex={2}>
       {/* Title */}
-      <Sequence durationInFrames={1036} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1224} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="The Phasor"
@@ -35,7 +35,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Phase ramp visualization */}
-      <Sequence from={0} durationInFrames={394} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={582} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -108,7 +108,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Code walkthrough */}
-      <Sequence from={394} durationInFrames={287} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={582} durationInFrames={287} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock
@@ -123,7 +123,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Waveform from phasor */}
-      <Sequence from={681} durationInFrames={355} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={869} durationInFrames={355} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -139,7 +139,7 @@ export const Phasor: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 12,
-                opacity: interpolate(frame - 681, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 869, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -163,7 +163,7 @@ export const Phasor: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 12,
-                opacity: interpolate(frame - 681, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 869, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
