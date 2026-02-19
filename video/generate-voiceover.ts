@@ -19,6 +19,7 @@ const OUTPUT_DIR = "public/voiceover";
 const PRONUNCIATION_MAP: Record<string, string> = {
   JUCE: "Juice",
   GUI: "gooey",
+  DAW: "daugh",
   APVTS: "A P V T S",
   ADSR: "A D S R",
   MIDI: "middy",

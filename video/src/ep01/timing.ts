@@ -8,7 +8,7 @@ export const SCENE_DURATIONS = {
   ENVELOPE: 1747, // 58.2s
   VOICE: 1514, // 50.5s
   SYNTH: 1235, // 41.2s
-  PLUGIN: 2844, // 94.8s
+  PLUGIN: 2891, // 96.4s
   OUTRO: 754, // 25.1s
 } as const;
 

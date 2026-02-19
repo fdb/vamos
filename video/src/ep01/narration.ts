@@ -162,22 +162,22 @@ export const NARRATION: SceneNarration[] = [
       {
         id: "08-plugin-0",
         text: "Everything we've built so far is pure DSP code — no plugin, no DAW, no knobs. By the end of this section, we'll have a working VST3 and Audio Unit plugin with over thirty automatable parameters. The bridge is JUCE's AudioProcessor — it's what your DAW talks to. It handles the audio callback, MIDI input, and plugin state.",
-        startFrame: 0, // 20.6s = 619 frames
+        startFrame: 0, // 21.7s = 653 frames
       },
       {
         id: "08-plugin-1",
         text: "JUCE provides a parameter system called the Audio Processor Value Tree State — or APVTS for short. It manages over thirty parameters: oscillator types, filter settings, envelope times, and more. Each parameter has a name, a range, and a default value. JUCE handles saving and loading these automatically, and exposes them to the DAW for automation.",
-        startFrame: 649, // prevAudio + 30 gap
+        startFrame: 683, // prevAudio + 30 gap
       },
       {
         id: "08-plugin-2",
         text: "Every time the DAW calls processBlock, we read all parameter values from the APVTS, pack them into our own SynthParams struct, and pass that to the synth engine. This is the bridge between JUCE's parameter tree and our pure DSP code. The synth then distributes these parameters to each active voice.",
-        startFrame: 1338, // prevAudio + 30 gap
+        startFrame: 1406, // prevAudio + 30 gap
       },
       {
         id: "08-plugin-3",
         text: "Four critical parameters — volume, filter frequency, and the two oscillator gains — use something called SmoothedValue. Without smoothing, when you move a knob, the value would jump instantly from, say, zero-point-five to zero-point-eight. That instant jump creates an audible click — like a tiny discontinuity in the audio signal. SmoothedValue ramps gradually instead, spreading the change over a few milliseconds. It's a small detail, but it makes the difference between a prototype and a polished instrument.",
-        startFrame: 1912, // prevAudio + 30 gap
+        startFrame: 1959, // prevAudio + 30 gap
       },
     ],
   },

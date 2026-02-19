@@ -25,10 +25,10 @@ export const PluginIntegration: React.FC = () => {
   const { fps } = useVideoConfig();
 
   // Durations derived from narration audio lengths
-  const SCENE_TOTAL = 2844;
-  const SEG0_END = 649;
-  const SEG1_END = 1338;
-  const SEG2_END = 1912;
+  const SCENE_TOTAL = 2891;
+  const SEG0_END = 683;
+  const SEG1_END = 1406;
+  const SEG2_END = 1959;
 
   return (
     <SceneContainer sceneIndex={7}>
