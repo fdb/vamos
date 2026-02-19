@@ -93,6 +93,9 @@ private:
     KnobWithLabel osc2DetuneKnob;
     KnobWithLabel osc2TransposeKnob;
 
+    // --- Noise ---
+    ComboWithLabel noiseTypeCombo;
+
     // --- Mixer controls ---
     KnobWithLabel osc1GainKnob;
     KnobWithLabel osc2GainKnob;
