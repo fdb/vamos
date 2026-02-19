@@ -71,7 +71,7 @@ export const Oscillator: React.FC = () => {
             <WaveformVisualizer
               type="saw"
               width={500}
-              height={220}
+              height={180}
               delay={10}
               color={COLORS.PINK}
               strokeWidth={3}
@@ -84,13 +84,22 @@ export const Oscillator: React.FC = () => {
                 color={COLORS.PINK}
                 icon="✗"
               />
-              <KeyPoint
-                text="Creates frequencies above Nyquist → aliasing"
-                delay={90}
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <SpectrumVisualizer
+                mode="aliased"
+                width={500}
+                height={150}
+                delay={300}
                 color={COLORS.PINK}
-                icon="✗"
               />
             </div>
+            <KeyPoint
+              text="Energy above Nyquist folds back as noise"
+              delay={370}
+              color={COLORS.PINK}
+              icon="✗"
+            />
           </div>
           <div style={{ flex: 1, maxWidth: 480 }}>
             <CodeBlock code={NAIVE_SAW} delay={30} mode="typewriter" fontSize={18} />

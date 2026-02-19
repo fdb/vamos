@@ -188,6 +188,8 @@ For each scene, create a React component in `src/epNN/scenes/`:
 
 ### Visualization Guidelines
 
+- **Show, don't tell.** If a concept can be visualized, visualize it — even if it needs a custom component. A spectrum showing aliased energy above the Nyquist line makes the abstract concept concrete in a way that narration alone cannot. Visuals and narration should reinforce each other: the viewer sees what they're hearing about.
+- **Time visual reveals to the narration.** A visualization is most effective when it appears at the exact moment the narration references it. If it comes too early, the viewer is processing visuals and audio about different things simultaneously. Calculate the `delay` prop so the visual lands on the relevant phrase, not at the start of the segment.
 - **Code walkthroughs**: Use `<CodeBlock>` with typewriter mode and highlighted lines
 - **Animated diagrams**: `<SignalFlowDiagram>`, `<WaveformVisualizer>`, `<ADSRVisualizer>`, `<VoiceGrid>`, `<SpectrumVisualizer>`
 - **Key points**: `<KeyPoint>` bullets with staggered `delay` props
