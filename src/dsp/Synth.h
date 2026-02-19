@@ -26,6 +26,7 @@ struct SynthParams {
     float osc1Gain = 0.5f;
     float osc2Gain = 0.398f;
     float noiseLevel = 0.0f;
+    NoiseType noiseType = NoiseType::White;
     bool osc1On = true;
     bool osc2On = true;
     bool noiseOn = true;

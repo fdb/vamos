@@ -1,7 +1,6 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
-#include <vector>
 
 // ── Synthwave LookAndFeel ──────────────────────────────────────────────────
 class VamosLookAndFeel : public juce::LookAndFeel_V4 {
@@ -25,6 +24,10 @@ public:
                            bool isTicked, bool hasSubMenu,
                            const juce::String& text, const juce::String& shortcutKeyText,
                            const juce::Drawable* icon, const juce::Colour* textColour) override;
+
+    void drawToggleButton(juce::Graphics&, juce::ToggleButton&,
+                          bool shouldDrawButtonAsHighlighted,
+                          bool shouldDrawButtonAsDown) override;
 };
 
 // ── Editor ─────────────────────────────────────────────────────────────────
@@ -40,7 +43,6 @@ public:
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void mouseDown(const juce::MouseEvent&) override;
 
 private:
     void timerCallback() override { repaint(); }
@@ -48,13 +50,12 @@ private:
     // Drawing helpers
     void drawSignalFlow(juce::Graphics& g);
     void drawBlock(juce::Graphics& g, juce::Rectangle<float> bounds,
-                   const juce::String& label, bool selected, juce::Colour colour);
+                   const juce::String& label, const juce::String& detail,
+                   juce::Colour colour);
     void drawNeonLine(juce::Graphics& g, float x1, float y1, float x2, float y2,
                       juce::Colour colour);
+    void drawSushiSections(juce::Graphics& g);
 
-    // Block interaction
-    void showBlockParams(Block b);
-    void layoutParamPanel();
     juce::Colour getBlockColour(Block b) const;
     juce::String getBlockName(Block b) const;
 
@@ -73,11 +74,16 @@ private:
     };
     ComboWithLabel createCombo(const juce::String& paramId, const juce::String& labelText);
 
+    struct ToggleWithLabel {
+        std::unique_ptr<juce::ToggleButton> button;
+        std::unique_ptr<juce::Label> label;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> attachment;
+    };
+    ToggleWithLabel createToggle(const juce::String& paramId, const juce::String& labelText);
+
     // ── Members (declaration order matters for destruction) ──
     VamosLookAndFeel vamosLAF;
     VamosProcessor& processor;
-    Block selectedBlock = Block::Osc1;
-    std::vector<std::pair<Block, juce::Rectangle<float>>> blockHitAreas;
 
     // --- Oscillator 1 controls ---
     ComboWithLabel osc1TypeCombo;
@@ -86,16 +92,24 @@ private:
     // --- Oscillator 2 controls ---
     ComboWithLabel osc2TypeCombo;
     KnobWithLabel osc2DetuneKnob;
+    KnobWithLabel osc2TransposeKnob;
+
+    // --- Noise ---
+    ComboWithLabel noiseTypeCombo;
 
     // --- Mixer controls ---
     KnobWithLabel osc1GainKnob;
     KnobWithLabel osc2GainKnob;
     KnobWithLabel noiseLevelKnob;
+    ToggleWithLabel osc1OnToggle;
+    ToggleWithLabel osc2OnToggle;
+    ToggleWithLabel noiseOnToggle;
 
     // --- Filter controls ---
     ComboWithLabel filterTypeCombo;
     KnobWithLabel filterFreqKnob;
     KnobWithLabel filterResKnob;
+    KnobWithLabel filterTrackingKnob;
 
     // --- Envelope 1 controls ---
     KnobWithLabel envAttackKnob;
@@ -106,6 +120,7 @@ private:
     // --- LFO controls ---
     ComboWithLabel lfoShapeCombo;
     KnobWithLabel lfoRateKnob;
+    KnobWithLabel lfoAmountKnob;
 
     // --- Global controls ---
     KnobWithLabel volumeKnob;
@@ -115,6 +130,8 @@ private:
     KnobWithLabel transposeKnob;
     KnobWithLabel velModKnob;
     KnobWithLabel bendRangeKnob;
+    ToggleWithLabel hiQualityToggle;
+    ToggleWithLabel resetPhaseToggle;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VamosEditor)
 };

@@ -17,6 +17,10 @@ static juce::StringArray lfoShapeChoices() {
     return { "Sine", "Triangle", "SawUp", "SawDown", "Square", "S&H", "Wander", "ExpEnv" };
 }
 
+static juce::StringArray noiseTypeChoices() {
+    return { "White", "Pink" };
+}
+
 static juce::StringArray voiceModeChoices() {
     return { "Poly", "Mono", "Stereo", "Unison" };
 }
@@ -50,6 +54,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout VamosProcessor::createParame
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("noiseLevel", 1), "Noise Level",
         juce::NormalisableRange<float>(0.0f, 2.0f), 0.0f));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+        juce::ParameterID("noiseType", 1), "Noise Type", noiseTypeChoices(), 0));
     params.push_back(std::make_unique<juce::AudioParameterBool>(
         juce::ParameterID("osc1On", 1), "Osc1 On", true));
     params.push_back(std::make_unique<juce::AudioParameterBool>(
@@ -152,6 +158,7 @@ void VamosProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBu
     auto osc1Gain    = apvts.getRawParameterValue("osc1Gain")->load();
     auto osc2Gain    = apvts.getRawParameterValue("osc2Gain")->load();
     auto noiseLevel  = apvts.getRawParameterValue("noiseLevel")->load();
+    auto noiseTypeIdx = static_cast<int>(apvts.getRawParameterValue("noiseType")->load());
     auto osc1On      = apvts.getRawParameterValue("osc1On")->load() > 0.5f;
     auto osc2On      = apvts.getRawParameterValue("osc2On")->load() > 0.5f;
     auto noiseOn     = apvts.getRawParameterValue("noiseOn")->load() > 0.5f;
@@ -195,6 +202,7 @@ void VamosProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBu
     sp.osc1Gain      = osc1Gain;
     sp.osc2Gain      = osc2Gain;
     sp.noiseLevel    = noiseLevel;
+    sp.noiseType     = static_cast<vamos::NoiseType>(noiseTypeIdx);
     sp.osc1On        = osc1On;
     sp.osc2On        = osc2On;
     sp.noiseOn       = noiseOn;

@@ -47,6 +47,7 @@ void Voice::setParameters(const SynthParams& p) {
     mixer.setOsc1Gain(p.osc1Gain);
     mixer.setOsc2Gain(p.osc2Gain);
     mixer.setNoiseLevel(p.noiseLevel);
+    noise.setType(p.noiseType);
     mixer.setOsc1On(p.osc1On);
     mixer.setOsc2On(p.osc2On);
     mixer.setNoiseOn(p.noiseOn);
