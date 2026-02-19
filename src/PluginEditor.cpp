@@ -122,6 +122,14 @@ VamosEditor::ComboWithLabel VamosEditor::createCombo(const juce::String& paramId
     ComboWithLabel cwl;
     cwl.combo = std::make_unique<juce::ComboBox>();
     cwl.combo->setLookAndFeel(&getVamosLAF());
+
+    // Populate combo box items from the AudioParameterChoice before attaching.
+    // ComboBoxAttachment does not auto-populate — the combo must already have items.
+    if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(
+            processor.apvts.getParameter(paramId))) {
+        cwl.combo->addItemList(choiceParam->choices, 1);
+    }
+
     addAndMakeVisible(cwl.combo.get());
 
     cwl.label = std::make_unique<juce::Label>("", labelText);
