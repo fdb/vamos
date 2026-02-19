@@ -26,107 +26,111 @@ static juce::StringArray voiceModeChoices() {
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout VamosProcessor::createParameterLayout() {
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-
-    // --- Oscillator 1 ---
-    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+    auto osc1 = std::make_unique<juce::AudioProcessorParameterGroup>("osc1", "Oscillator 1", "|");
+    osc1->addChild(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("osc1Type", 1), "Osc1 Type", oscType1Choices(), 0));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    osc1->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("osc1Shape", 1), "Osc1 Shape",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f));
 
-    // --- Oscillator 2 ---
-    params.push_back(std::make_unique<juce::AudioParameterChoice>(
-        juce::ParameterID("osc2Type", 1), "Osc2 Type", oscType2Choices(), 2)); // Sine default
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    auto osc2 = std::make_unique<juce::AudioProcessorParameterGroup>("osc2", "Oscillator 2", "|");
+    osc2->addChild(std::make_unique<juce::AudioParameterChoice>(
+        juce::ParameterID("osc2Type", 1), "Osc2 Type", oscType2Choices(), 2));
+    osc2->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("osc2Detune", 1), "Osc2 Detune",
         juce::NormalisableRange<float>(-100.0f, 100.0f), 0.0f));
-    params.push_back(std::make_unique<juce::AudioParameterInt>(
+    osc2->addChild(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID("osc2Transpose", 1), "Osc2 Transpose", -24, 24, -12));
 
-    // --- Mixer ---
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    auto mixer = std::make_unique<juce::AudioProcessorParameterGroup>("mixer", "Mixer", "|");
+    mixer->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("osc1Gain", 1), "Osc1 Gain",
         juce::NormalisableRange<float>(0.0f, 2.0f), 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    mixer->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("osc2Gain", 1), "Osc2 Gain",
         juce::NormalisableRange<float>(0.0f, 2.0f), 0.398f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    mixer->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("noiseLevel", 1), "Noise Level",
         juce::NormalisableRange<float>(0.0f, 2.0f), 0.0f));
-    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+    mixer->addChild(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("noiseType", 1), "Noise Type", noiseTypeChoices(), 0));
-    params.push_back(std::make_unique<juce::AudioParameterBool>(
+    mixer->addChild(std::make_unique<juce::AudioParameterBool>(
         juce::ParameterID("osc1On", 1), "Osc1 On", true));
-    params.push_back(std::make_unique<juce::AudioParameterBool>(
+    mixer->addChild(std::make_unique<juce::AudioParameterBool>(
         juce::ParameterID("osc2On", 1), "Osc2 On", true));
-    params.push_back(std::make_unique<juce::AudioParameterBool>(
+    mixer->addChild(std::make_unique<juce::AudioParameterBool>(
         juce::ParameterID("noiseOn", 1), "Noise On", true));
 
-    // --- Filter ---
-    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+    auto filter = std::make_unique<juce::AudioProcessorParameterGroup>("filter", "Filter", "|");
+    filter->addChild(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("filterType", 1), "Filter Type", filterTypeChoices(), 0));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    filter->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("filterFreq", 1), "Filter Freq",
         juce::NormalisableRange<float>(20.0f, 20000.0f, 0.0f, 0.3f), 20000.0f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    filter->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("filterRes", 1), "Filter Res",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    filter->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("filterTracking", 1), "Filter Tracking",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f));
 
-    // --- Envelope 1 ---
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    auto envelope = std::make_unique<juce::AudioProcessorParameterGroup>("envelope", "Envelope", "|");
+    envelope->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("env1Attack", 1), "Env1 Attack",
         juce::NormalisableRange<float>(0.001f, 6.0f, 0.0f, 0.4f), 0.001f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    envelope->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("env1Decay", 1), "Env1 Decay",
         juce::NormalisableRange<float>(0.01f, 10.0f, 0.0f, 0.4f), 0.6f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    envelope->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("env1Sustain", 1), "Env1 Sustain",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.7f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    envelope->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("env1Release", 1), "Env1 Release",
         juce::NormalisableRange<float>(0.01f, 10.0f, 0.0f, 0.4f), 0.6f));
 
-    // --- LFO ---
-    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+    auto lfo = std::make_unique<juce::AudioProcessorParameterGroup>("lfo", "LFO", "|");
+    lfo->addChild(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("lfoShape", 1), "LFO Shape", lfoShapeChoices(), 0));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    lfo->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("lfoRate", 1), "LFO Rate",
         juce::NormalisableRange<float>(0.01f, 30.0f, 0.0f, 0.4f), 0.4f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    lfo->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("lfoAmount", 1), "LFO Amount",
         juce::NormalisableRange<float>(0.0f, 1.0f), 1.0f));
 
-    // --- Global ---
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    auto global = std::make_unique<juce::AudioProcessorParameterGroup>("global", "Global", "|");
+    global->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("volume", 1), "Volume",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+    global->addChild(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("voiceMode", 1), "Voice Mode", voiceModeChoices(), 0));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    global->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("glide", 1), "Glide",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    global->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("driftDepth", 1), "Drift Depth",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.072f));
-
-    // --- Phase 7: Additional Global Parameters ---
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+    global->addChild(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("volVelMod", 1), "Vel Mod",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterInt>(
+    global->addChild(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID("transpose", 1), "Transpose", -24, 24, 0));
-    params.push_back(std::make_unique<juce::AudioParameterBool>(
+    global->addChild(std::make_unique<juce::AudioParameterBool>(
         juce::ParameterID("hiQuality", 1), "Hi Quality", false));
-    params.push_back(std::make_unique<juce::AudioParameterBool>(
+    global->addChild(std::make_unique<juce::AudioParameterBool>(
         juce::ParameterID("resetOscPhase", 1), "Reset Phase", false));
-    params.push_back(std::make_unique<juce::AudioParameterInt>(
+    global->addChild(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID("pitchBendRange", 1), "Bend Range", 1, 24, 2));
 
-    return { params.begin(), params.end() };
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    layout.add(std::move(osc1));
+    layout.add(std::move(osc2));
+    layout.add(std::move(mixer));
+    layout.add(std::move(filter));
+    layout.add(std::move(envelope));
+    layout.add(std::move(lfo));
+    layout.add(std::move(global));
+    return layout;
 }
 
 VamosProcessor::VamosProcessor()
