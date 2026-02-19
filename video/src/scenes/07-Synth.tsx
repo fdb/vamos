@@ -15,6 +15,8 @@ import { VoiceGrid } from "../components/VoiceGrid";
 import { KeyPoint } from "../components/KeyPoint";
 import { NeonBox } from "../components/NeonBox";
 import { SYNTH_CODE } from "../lib/code-snippets";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 const VOICE_EVENTS = [
   { frame: 30, voice: 0, type: "noteOn" as const, note: "C4" },
@@ -163,6 +165,7 @@ export const Synth: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[6].segments} />
     </SceneContainer>
   );
 };

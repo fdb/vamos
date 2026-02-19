@@ -15,6 +15,8 @@ import { WaveformVisualizer } from "../components/WaveformVisualizer";
 import { KeyPoint } from "../components/KeyPoint";
 import { NeonBox } from "../components/NeonBox";
 import { PHASOR_CODE } from "../lib/code-snippets";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const Phasor: React.FC = () => {
   const frame = useCurrentFrame();
@@ -180,6 +182,7 @@ export const Phasor: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[2].segments} />
     </SceneContainer>
   );
 };

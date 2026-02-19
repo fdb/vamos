@@ -15,6 +15,8 @@ import { WaveformVisualizer } from "../components/WaveformVisualizer";
 import { KeyPoint } from "../components/KeyPoint";
 import { NeonBox } from "../components/NeonBox";
 import { NAIVE_SAW, POLYBLEP_CODE } from "../lib/code-snippets";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const Oscillator: React.FC = () => {
   const frame = useCurrentFrame();
@@ -203,6 +205,7 @@ export const Oscillator: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[3].segments} />
     </SceneContainer>
   );
 };

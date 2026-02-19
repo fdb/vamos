@@ -15,6 +15,8 @@ import { SignalFlowDiagram } from "../components/SignalFlowDiagram";
 import { KeyPoint } from "../components/KeyPoint";
 import { NeonBox } from "../components/NeonBox";
 import { VOICE_CODE } from "../lib/code-snippets";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const Voice: React.FC = () => {
   const frame = useCurrentFrame();
@@ -107,6 +109,7 @@ export const Voice: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[5].segments} />
     </SceneContainer>
   );
 };

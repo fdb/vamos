@@ -17,6 +17,8 @@ import { NeonBox } from "../components/NeonBox";
 import { Badge } from "../components/Badge";
 import { CMAKE_FETCH_CONTENT, JUCE_PLUGIN_TARGET } from "../lib/code-snippets";
 import { FILE_TREE_DATA } from "../lib/code-snippets";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const ProjectSetup: React.FC = () => {
   const frame = useCurrentFrame();
@@ -149,6 +151,7 @@ export const ProjectSetup: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[1].segments} />
     </SceneContainer>
   );
 };

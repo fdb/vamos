@@ -13,6 +13,8 @@ import { SPRING_SMOOTH, SPRING_BOUNCY, PREMOUNT_FRAMES, STAGGER_OFFSET } from ".
 import { SceneContainer } from "../components/SceneContainer";
 import { Badge } from "../components/Badge";
 import { SignalFlowDiagram } from "../components/SignalFlowDiagram";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const Intro: React.FC = () => {
   const frame = useCurrentFrame();
@@ -225,6 +227,7 @@ export const Intro: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[0].segments} />
     </SceneContainer>
   );
 };

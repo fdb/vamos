@@ -15,6 +15,8 @@ import { ADSRVisualizer } from "../components/ADSRVisualizer";
 import { KeyPoint } from "../components/KeyPoint";
 import { NeonBox } from "../components/NeonBox";
 import { ENVELOPE_CODE } from "../lib/code-snippets";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const Envelope: React.FC = () => {
   const frame = useCurrentFrame();
@@ -182,6 +184,7 @@ export const Envelope: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[4].segments} />
     </SceneContainer>
   );
 };

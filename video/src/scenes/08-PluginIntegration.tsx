@@ -17,6 +17,8 @@ import { KeyPoint } from "../components/KeyPoint";
 import { NeonBox } from "../components/NeonBox";
 import { Badge } from "../components/Badge";
 import { PROCESS_BLOCK_CODE } from "../lib/code-snippets";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const PluginIntegration: React.FC = () => {
   const frame = useCurrentFrame();
@@ -144,6 +146,7 @@ export const PluginIntegration: React.FC = () => {
           </div>
         </AbsoluteFill>
       </Sequence>
+      <SceneNarration segments={NARRATION[7].segments} />
     </SceneContainer>
   );
 };

@@ -10,6 +10,8 @@ import { COLORS } from "../lib/colors";
 import { FONT_SANS, FONT_MONO } from "../lib/fonts";
 import { SPRING_SMOOTH } from "../lib/timing";
 import { SceneContainer } from "../components/SceneContainer";
+import { SceneNarration } from "../components/SceneNarration";
+import { NARRATION } from "../lib/narration";
 
 export const Outro: React.FC = () => {
   const frame = useCurrentFrame();
@@ -99,6 +101,7 @@ export const Outro: React.FC = () => {
           7 waveforms · PolyBLEP · Noise generator
         </div>
       </AbsoluteFill>
+      <SceneNarration segments={NARRATION[8].segments} />
     </SceneContainer>
   );
 };
