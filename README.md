@@ -24,11 +24,7 @@ in the open, with AI, one episode at a time.
 
 Vamos is a polyphonic software synthesizer plugin written in C++20 with [JUCE](https://juce.com/), inspired by Ableton's Drift. Eight voices, dual oscillators with PolyBLEP anti-aliasing, eight filter types, exponential ADSR envelopes, an LFO, a cycling envelope, and a modulation matrix with flexible routing. It runs as VST3, Audio Unit, and standalone app. It works in your DAW.
 
-```
-Osc1 + Osc2 + Noise → Mixer → Filter → Amp Envelope → Pan → Output
-                                  ↑
-              ModMatrix (Env1, Env2/CycEnv, LFO, Velocity, Modwheel, etc.)
-```
+<p align="center"><img src=".github/vamos-signal-flow.png" alt="Signal flow: Osc1 + Osc2 + Noise → Mixer → Filter → Amp → Output, with modulator routing below" width="720"></p>
 
 The code is split into two layers:
 
