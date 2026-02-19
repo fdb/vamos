@@ -1,8 +1,23 @@
+<div align="center">
+
 # Vamos
 
-A polyphonic software synthesizer plugin built from scratch in C++20 with [JUCE](https://juce.com/). Inspired by Ableton's Drift, Vamos runs as VST3, Audio Unit, and standalone app.
+**A polyphonic software synthesizer built from scratch in C++20 with [JUCE](https://juce.com/)**
 
-![Vamos UI](.github/vamos-ui.png)
+*Inspired by Ableton's Drift &mdash; runs as VST3, Audio Unit, and standalone app*
+
+<br>
+
+<img src=".github/vamos-ui.png" alt="Vamos synthesizer UI" width="720">
+
+<br>
+<br>
+
+`C++20` &nbsp; `JUCE 8` &nbsp; `VST3 / AU` &nbsp; `CMake` &nbsp; `Catch2`
+
+</div>
+
+<br>
 
 ## What this project is
 
