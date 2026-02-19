@@ -50,7 +50,8 @@ private:
     // Drawing helpers
     void drawSignalFlow(juce::Graphics& g);
     void drawBlock(juce::Graphics& g, juce::Rectangle<float> bounds,
-                   const juce::String& label, bool selected, juce::Colour colour);
+                   const juce::String& label, const juce::String& detail,
+                   juce::Colour colour);
     void drawNeonLine(juce::Graphics& g, float x1, float y1, float x2, float y2,
                       juce::Colour colour);
     void drawSushiSections(juce::Graphics& g);

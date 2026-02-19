@@ -317,16 +317,29 @@ juce::String VamosEditor::getBlockName(Block b) const {
 // ── Drawing helpers ────────────────────────────────────────────────────────
 
 void VamosEditor::drawBlock(juce::Graphics& g, juce::Rectangle<float> bounds,
-                             const juce::String& label, bool, juce::Colour colour)
+                             const juce::String& label, const juce::String& detail,
+                             juce::Colour colour)
 {
-    // Decorative blocks — brighter than before so they look alive
     g.setColour(colour.withAlpha(0.12f));
     g.fillRoundedRectangle(bounds, 5.0f);
     g.setColour(colour.withAlpha(0.45f));
     g.drawRoundedRectangle(bounds, 5.0f, 1.0f);
-    g.setColour(colour.withAlpha(0.75f));
-    g.setFont(juce::Font(10.0f));
-    g.drawText(label, bounds, juce::Justification::centred);
+
+    if (detail.isEmpty()) {
+        // Single line — centered
+        g.setColour(colour.withAlpha(0.75f));
+        g.setFont(juce::Font(10.0f));
+        g.drawText(label, bounds, juce::Justification::centred);
+    } else {
+        // Two lines: label top, detail bottom (smaller, dimmer)
+        auto topHalf = bounds.removeFromTop(bounds.getHeight() * 0.52f);
+        g.setColour(colour.withAlpha(0.75f));
+        g.setFont(juce::Font(10.0f));
+        g.drawText(label, topHalf, juce::Justification::centredBottom);
+        g.setColour(colour.withAlpha(0.45f));
+        g.setFont(juce::Font(8.5f));
+        g.drawText(detail, bounds, juce::Justification::centredTop);
+    }
 }
 
 void VamosEditor::drawNeonLine(juce::Graphics& g, float x1, float y1, float x2, float y2,
@@ -339,73 +352,83 @@ void VamosEditor::drawNeonLine(juce::Graphics& g, float x1, float y1, float x2, 
 }
 
 void VamosEditor::drawSignalFlow(juce::Graphics& g) {
-    const float bw = 66.0f, bh = 26.0f;
-    const float vGap = 5.0f, hGap = 18.0f;
+    // Larger blocks with room for two-line labels (name + current param)
+    const float bw = 90.0f, bh = 32.0f;
+    const float vGap = 4.0f, hGap = 16.0f;
+    const float outW = 50.0f;
 
-    // Center the entire flow diagram horizontally
-    // Total width: sources(66) + gap + mixer(66) + gap + filter(66) + gap + amp(66) + gap + out(44)
-    //              + voiceGap(24) + voices(72) = 472
-    const float totalFlowW = 5 * bw + 4 * hGap - (bw - 44.0f) + 24.0f + 72.0f;
-    const float startX = ((float)getWidth() - totalFlowW) * 0.5f;
-    const float topY = 30.0f;
+    // Center horizontally: sources + mixer + filter + amp + out + voice gap + voices
+    const float chainW = 4 * bw + outW + 4 * hGap;  // source-to-OUT
+    const float voiceGap = 24.0f, voiceW = 80.0f;
+    const float totalW = chainW + voiceGap + voiceW;
+    const float startX = ((float)getWidth() - totalW) * 0.5f;
+    const float topY = 8.0f;
 
-    // ── Source column ──
+    // Read current parameter values for block annotations
+    auto osc1Detail  = osc1TypeCombo.combo->getText();
+    auto osc2Detail  = osc2TypeCombo.combo->getText();
+    auto noiseDetail = noiseTypeCombo.combo->getText();
+    auto filterDetail = filterTypeCombo.combo->getText();
+    auto voiceDetail = voiceModeCombo.combo->getText();
+
+    // ── Source column (3 blocks stacked) ──
     auto osc1Rect  = juce::Rectangle<float>(startX, topY, bw, bh);
     auto osc2Rect  = juce::Rectangle<float>(startX, topY + bh + vGap, bw, bh);
     auto noiseRect = juce::Rectangle<float>(startX, topY + 2 * (bh + vGap), bw, bh);
 
-    drawBlock(g, osc1Rect,  "Osc 1", false, kCyan);
-    drawBlock(g, osc2Rect,  "Osc 2", false, kCyan);
-    drawBlock(g, noiseRect, "Noise", false, kCyan);
+    drawBlock(g, osc1Rect,  "Osc 1", osc1Detail,  kCyan);
+    drawBlock(g, osc2Rect,  "Osc 2", osc2Detail,  kCyan);
+    drawBlock(g, noiseRect, "Noise", noiseDetail, kCyan);
 
     // ── Mixer ──
     float mixerX = startX + bw + hGap;
     auto mixerRect = juce::Rectangle<float>(mixerX, osc2Rect.getY(), bw, bh);
-    drawBlock(g, mixerRect, "Mixer", false, kAmber);
+    drawBlock(g, mixerRect, "Mixer", "", kAmber);
 
-    drawNeonLine(g, osc1Rect.getRight(),  osc1Rect.getCentreY(),  mixerRect.getX(), mixerRect.getCentreY() - 6, kCyan);
+    drawNeonLine(g, osc1Rect.getRight(),  osc1Rect.getCentreY(),  mixerRect.getX(), mixerRect.getCentreY() - 7, kCyan);
     drawNeonLine(g, osc2Rect.getRight(),  osc2Rect.getCentreY(),  mixerRect.getX(), mixerRect.getCentreY(),     kCyan);
-    drawNeonLine(g, noiseRect.getRight(), noiseRect.getCentreY(), mixerRect.getX(), mixerRect.getCentreY() + 6, kCyan);
+    drawNeonLine(g, noiseRect.getRight(), noiseRect.getCentreY(), mixerRect.getX(), mixerRect.getCentreY() + 7, kCyan);
 
     // ── Filter ──
     float filterX = mixerX + bw + hGap;
     auto filterRect = juce::Rectangle<float>(filterX, osc2Rect.getY(), bw, bh);
-    drawBlock(g, filterRect, "Filter", false, kPink);
+    drawBlock(g, filterRect, "Filter", filterDetail, kPink);
     drawNeonLine(g, mixerRect.getRight(), mixerRect.getCentreY(), filterRect.getX(), filterRect.getCentreY(), kAmber);
 
     // ── Amp ──
     float ampX = filterX + bw + hGap;
     auto ampRect = juce::Rectangle<float>(ampX, osc2Rect.getY(), bw, bh);
-    drawBlock(g, ampRect, "Amp", false, kGreen);
+    drawBlock(g, ampRect, "Amp", "Env 1", kGreen);
     drawNeonLine(g, filterRect.getRight(), filterRect.getCentreY(), ampRect.getX(), ampRect.getCentreY(), kPink);
 
     // ── OUT ──
     float outX = ampX + bw + hGap;
-    auto outRect = juce::Rectangle<float>(outX, osc2Rect.getY(), 44, bh);
-    drawBlock(g, outRect, "OUT", false, juce::Colours::white);
+    auto outRect = juce::Rectangle<float>(outX, osc2Rect.getY(), outW, bh);
+    drawBlock(g, outRect, "OUT", voiceDetail, juce::Colours::white);
     drawNeonLine(g, ampRect.getRight(), ampRect.getCentreY(), outRect.getX(), outRect.getCentreY(), kGreen);
 
-    // ── Modulator row ──
-    float modY = noiseRect.getBottom() + 14.0f;
-    float modBw = 56.0f, modGap = 6.0f;
+    // ── Modulator row (smaller blocks) ──
+    float modBh = 24.0f;
+    float modY = noiseRect.getBottom() + 12.0f;
+    float modBw = 60.0f, modGap = 6.0f;
 
     g.setColour(kDimText);
     g.setFont(juce::Font(8.0f));
     g.drawText("MODULATORS", startX, modY - 10, 100, 10, juce::Justification::left);
 
-    drawBlock(g, { startX, modY, modBw, bh }, "Env 2", false, kViolet);
-    auto cycRect = juce::Rectangle<float>(startX + modBw + modGap, modY, modBw, bh);
-    drawBlock(g, cycRect, "CycEnv", false, kViolet);
-    auto lfoRect = juce::Rectangle<float>(startX + 2 * (modBw + modGap), modY, modBw, bh);
-    drawBlock(g, lfoRect, "LFO", false, kViolet);
-    auto modMatRect = juce::Rectangle<float>(startX + 3 * (modBw + modGap), modY, modBw + 8, bh);
-    drawBlock(g, modMatRect, "ModMtx", false, kViolet);
-    auto driftRect = juce::Rectangle<float>(startX + 4 * (modBw + modGap) + 8, modY, modBw, bh);
-    drawBlock(g, driftRect, "Drift", false, kDriftYellow);
+    auto env2Rect = juce::Rectangle<float>(startX, modY, modBw, modBh);
+    drawBlock(g, env2Rect, "Env 2", "", kViolet);
+    auto cycRect = juce::Rectangle<float>(startX + modBw + modGap, modY, modBw, modBh);
+    drawBlock(g, cycRect, "CycEnv", "", kViolet);
+    auto lfoRect = juce::Rectangle<float>(startX + 2 * (modBw + modGap), modY, modBw, modBh);
+    drawBlock(g, lfoRect, "LFO", "", kViolet);
+    auto modMatRect = juce::Rectangle<float>(startX + 3 * (modBw + modGap), modY, modBw + 8, modBh);
+    drawBlock(g, modMatRect, "ModMtx", "", kViolet);
+    auto driftRect = juce::Rectangle<float>(startX + 4 * (modBw + modGap) + 8, modY, modBw, modBh);
+    drawBlock(g, driftRect, "Drift", "", kDriftYellow);
 
     // ── Dashed mod connections ──
     float dashLengths[] = {3.0f, 3.0f};
-    auto env2Rect = juce::Rectangle<float>(startX, modY, modBw, bh);
     g.setColour(kViolet.withAlpha(0.2f));
     g.drawDashedLine(juce::Line<float>(env2Rect.getCentreX(), env2Rect.getY(),
                      filterRect.getCentreX(), filterRect.getBottom()), dashLengths, 2, 1.0f);
@@ -417,12 +440,12 @@ void VamosEditor::drawSignalFlow(juce::Graphics& g) {
 
     // ── Voice indicators ──
     const auto& voices = processor.getSynth().getVoices();
-    float voiceX = outRect.getRight() + 24.0f;
+    float voiceX = outRect.getRight() + voiceGap;
     float voiceBaseY = osc1Rect.getY();
 
     g.setColour(kDimText);
     g.setFont(juce::Font(8.0f));
-    g.drawText("VOICES", voiceX, voiceBaseY - 2, 72, 10, juce::Justification::left);
+    g.drawText("VOICES", voiceX, voiceBaseY - 2, voiceW, 10, juce::Justification::left);
 
     for (int i = 0; i < 8; ++i) {
         float vx = voiceX + (float)(i % 4) * 18.0f;
@@ -469,11 +492,6 @@ void VamosEditor::drawSushiSections(juce::Graphics& g) {
 
 void VamosEditor::paint(juce::Graphics& g) {
     g.fillAll(kBackground);
-
-    // Title
-    g.setColour(kText);
-    g.setFont(juce::Font(18.0f).boldened());
-    g.drawText("VAMOS", 0, 4, getWidth(), 22, juce::Justification::centred);
 
     drawSignalFlow(g);
 
