@@ -67,6 +67,15 @@ const PRONUNCIATION_MAP: Record<string, string> = {
 - Between major topics, add a brief bridging narration segment that wraps up what was just covered and motivates what's coming next.
 - Don't jump abruptly from one DSP concept to another — give the viewer a moment to absorb.
 
+### Scene Openings
+
+When a new scene begins, the viewer should understand what they're building toward — give them the destination before the journey. This framing can happen in one of two places, and varying between them keeps the pacing interesting:
+
+- **At the end of the previous scene:** A bridging sentence that wraps up and motivates the next topic (e.g., "a tone that drones forever isn't musical — we need envelopes"). When the previous scene already does this, the new scene can open directly with content.
+- **At the start of the new scene:** A brief goal statement before diving into the mechanism (e.g., "By the end of this section, we'll have a working eight-voice synth"). Use this when the previous scene didn't set up the transition.
+
+Don't do both — if the previous scene's ending already frames the destination, the new scene can open differently (with a definition, an example, or straight into the concept). Variety is good. Keep goal framing to one or two sentences — don't over-explain the roadmap.
+
 ### Wrap-Up Structure
 
 - End each episode with a recap of what was built, then preview the next episode's content.
@@ -213,3 +222,12 @@ cd video && npx remotion render Ep01-Foundation --output=out/ep01.mp4
 ```
 
 Verify: correct duration, 1920x1080, audio and visuals in sync.
+
+## Step 9: Prepare for YouTube
+
+```bash
+npm run prepare-youtube
+```
+
+Generates `out/ep01.vtt` (subtitles), `out/ep01-description.txt` (title, description, chapters),
+and `out/ep01-thumbnail.png` (1280x720 thumbnail).
