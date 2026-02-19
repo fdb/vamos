@@ -89,8 +89,8 @@ TEST_CASE("Editor creates and destroys without crash", "[plugin][editor]") {
         REQUIRE(editor != nullptr);
 
         // Verify the editor has the expected size
-        REQUIRE(editor->getWidth() == 900);
-        REQUIRE(editor->getHeight() == 700);
+        REQUIRE(editor->getWidth() == 740);
+        REQUIRE(editor->getHeight() == 440);
 
         delete editor;
     }

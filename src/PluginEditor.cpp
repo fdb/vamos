@@ -1,72 +1,121 @@
 #include "PluginEditor.h"
 
-static const juce::Colour kBackground   (0xFF1A1A2E);
-static const juce::Colour kOscColour    (0xFF4FC3F7);
-static const juce::Colour kMixerColour  (0xFFFFB74D);
-static const juce::Colour kFilterColour (0xFFE57373);
-static const juce::Colour kAmpColour    (0xFF81C784);
-static const juce::Colour kModColour    (0xFFCE93D8);
-static const juce::Colour kLabelColour  (0xFFCCCCCC);
-static const juce::Colour kKnobFill     (0xFF2A2A4E);
-static const juce::Colour kKnobOutline  (0xFF555588);
+// ── Synthwave Palette ──────────────────────────────────────────────────────
+static const juce::Colour kBackground  (0xFF0D0D1A);
+static const juce::Colour kPanelBg     (0xFF12122B);
+static const juce::Colour kKnobTrack   (0xFF222244);
+static const juce::Colour kText        (0xFFE0E0F0);
+static const juce::Colour kDimText     (0xFF8888AA);
+static const juce::Colour kCyan        (0xFF00E5FF);
+static const juce::Colour kPink        (0xFFFF2D7B);
+static const juce::Colour kGreen       (0xFF39FF14);
+static const juce::Colour kAmber       (0xFFFFAA00);
+static const juce::Colour kViolet      (0xFFBB44FF);
+static const juce::Colour kDriftYellow (0xFFFFF176);
 
-class VamosLookAndFeel : public juce::LookAndFeel_V4 {
-public:
-    VamosLookAndFeel() {
-        setColour(juce::Slider::rotarySliderFillColourId, kOscColour);
-        setColour(juce::Slider::rotarySliderOutlineColourId, kKnobOutline);
-        setColour(juce::Slider::thumbColourId, juce::Colours::white);
-        setColour(juce::ComboBox::backgroundColourId, kKnobFill);
-        setColour(juce::ComboBox::outlineColourId, kKnobOutline);
-        setColour(juce::ComboBox::textColourId, juce::Colours::white);
-        setColour(juce::PopupMenu::backgroundColourId, juce::Colour(0xFF222244));
-        setColour(juce::PopupMenu::textColourId, juce::Colours::white);
-        setColour(juce::PopupMenu::highlightedBackgroundColourId, kOscColour.withAlpha(0.3f));
-    }
+// ── VamosLookAndFeel ───────────────────────────────────────────────────────
 
-    void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
-                          float sliderPos, float rotaryStartAngle, float rotaryEndAngle,
-                          juce::Slider& slider) override
-    {
-        auto radius = (float)juce::jmin(width / 2, height / 2) - 4.0f;
-        auto centreX = (float)x + (float)width * 0.5f;
-        auto centreY = (float)y + (float)height * 0.5f;
-        auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+VamosLookAndFeel::VamosLookAndFeel() {
+    setColour(juce::ComboBox::textColourId, kText);
+    setColour(juce::ComboBox::backgroundColourId, kPanelBg);
+    setColour(juce::ComboBox::outlineColourId, kKnobTrack);
+    setColour(juce::PopupMenu::backgroundColourId, kPanelBg);
+    setColour(juce::PopupMenu::textColourId, kText);
+    setColour(juce::PopupMenu::highlightedBackgroundColourId, kCyan.withAlpha(0.25f));
+}
 
-        juce::Path bgArc;
-        bgArc.addCentredArc(centreX, centreY, radius, radius, 0.0f,
-                            rotaryStartAngle, rotaryEndAngle, true);
-        g.setColour(kKnobOutline.withAlpha(0.4f));
-        g.strokePath(bgArc, juce::PathStrokeType(3.0f));
+void VamosLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
+                                         float sliderPos, float rotaryStartAngle, float rotaryEndAngle,
+                                         juce::Slider&)
+{
+    auto radius = (float)juce::jmin(width / 2, height / 2) - 4.0f;
+    auto centreX = (float)x + (float)width * 0.5f;
+    auto centreY = (float)y + (float)height * 0.5f;
+    auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
 
+    // Dark track arc
+    juce::Path bgArc;
+    bgArc.addCentredArc(centreX, centreY, radius, radius, 0.0f,
+                         rotaryStartAngle, rotaryEndAngle, true);
+    g.setColour(kKnobTrack);
+    g.strokePath(bgArc, juce::PathStrokeType(3.0f));
+
+    // Value arc with glow
+    if (sliderPos > 0.001f) {
         juce::Path valueArc;
         valueArc.addCentredArc(centreX, centreY, radius, radius, 0.0f,
-                               rotaryStartAngle, angle, true);
-        g.setColour(kOscColour);
-        g.strokePath(valueArc, juce::PathStrokeType(3.0f));
-
-        auto pointerLength = radius * 0.6f;
-        auto pointerX = centreX + pointerLength * std::cos(angle - juce::MathConstants<float>::halfPi);
-        auto pointerY = centreY + pointerLength * std::sin(angle - juce::MathConstants<float>::halfPi);
-        g.setColour(juce::Colours::white);
-        g.fillEllipse(pointerX - 3.0f, pointerY - 3.0f, 6.0f, 6.0f);
-
-        (void)slider;
+                                rotaryStartAngle, angle, true);
+        // Glow layer (wide, semi-transparent)
+        g.setColour(accentColour.withAlpha(0.2f));
+        g.strokePath(valueArc, juce::PathStrokeType(7.0f));
+        // Bright core
+        g.setColour(accentColour);
+        g.strokePath(valueArc, juce::PathStrokeType(2.5f));
     }
-};
 
-static VamosLookAndFeel& getVamosLAF() {
-    static VamosLookAndFeel laf;
-    return laf;
+    // White pointer line
+    auto pointerLen = radius * 0.82f;
+    auto px = centreX + pointerLen * std::cos(angle - juce::MathConstants<float>::halfPi);
+    auto py = centreY + pointerLen * std::sin(angle - juce::MathConstants<float>::halfPi);
+    g.setColour(juce::Colours::white);
+    g.drawLine(centreX, centreY, px, py, 2.0f);
 }
+
+void VamosLookAndFeel::drawComboBox(juce::Graphics& g, int width, int height, bool,
+                                     int, int, int, int, juce::ComboBox&)
+{
+    auto bounds = juce::Rectangle<int>(0, 0, width, height).toFloat().reduced(0.5f);
+    g.setColour(kPanelBg);
+    g.fillRoundedRectangle(bounds, 4.0f);
+    g.setColour(accentColour.withAlpha(0.5f));
+    g.drawRoundedRectangle(bounds, 4.0f, 1.0f);
+
+    // Triangle arrow
+    float arrowX = (float)width - 14.0f;
+    float arrowY = (float)height * 0.5f;
+    juce::Path arrow;
+    arrow.addTriangle(arrowX - 4, arrowY - 3, arrowX + 4, arrowY - 3, arrowX, arrowY + 3);
+    g.setColour(accentColour);
+    g.fillPath(arrow);
+}
+
+void VamosLookAndFeel::drawPopupMenuBackground(juce::Graphics& g, int width, int height) {
+    g.fillAll(kPanelBg);
+    g.setColour(kKnobTrack);
+    g.drawRect(0, 0, width, height);
+}
+
+void VamosLookAndFeel::drawPopupMenuItem(juce::Graphics& g, const juce::Rectangle<int>& area,
+                                          bool isSeparator, bool isActive, bool isHighlighted,
+                                          bool isTicked, bool,
+                                          const juce::String& text, const juce::String&,
+                                          const juce::Drawable*, const juce::Colour*)
+{
+    if (isSeparator) {
+        g.setColour(kKnobTrack);
+        g.fillRect(area.reduced(5, 0).withHeight(1).withY(area.getCentreY()));
+        return;
+    }
+
+    if (isHighlighted && isActive) {
+        g.setColour(accentColour.withAlpha(0.18f));
+        g.fillRect(area);
+    }
+
+    g.setColour(isActive ? (isTicked ? accentColour : kText) : kDimText);
+    g.setFont(juce::Font(13.0f));
+    g.drawText(text, area.reduced(10, 0), juce::Justification::centredLeft);
+}
+
+// ── VamosEditor ────────────────────────────────────────────────────────────
 
 VamosEditor::VamosEditor(VamosProcessor& p)
     : AudioProcessorEditor(p), processor(p)
 {
-    setLookAndFeel(&getVamosLAF());
+    // 1. Set LookAndFeel
+    setLookAndFeel(&vamosLAF);
 
-    // Create all child components BEFORE setSize() -- setSize triggers resized()
-    // which calls setBounds on these widgets. If they're null, we crash.
+    // 2. Create ALL child components before setSize
     osc1TypeCombo  = createCombo("osc1Type", "Type");
     osc1ShapeKnob  = createKnob("osc1Shape", "Shape");
     osc2TypeCombo  = createCombo("osc2Type", "Type");
@@ -91,9 +140,21 @@ VamosEditor::VamosEditor(VamosProcessor& p)
     velModKnob     = createKnob("volVelMod", "VelMod");
     bendRangeKnob  = createKnob("pitchBendRange", "Bend");
 
-    setSize(900, 700);
+    // 3. Set initial visibility (hides non-Osc1 controls)
+    showBlockParams(Block::Osc1);
+
+    // 4. setSize triggers resized() -> layoutParamPanel()
+    setSize(740, 440);
+
+    // 5. Start repaint timer
     startTimerHz(30);
 }
+
+VamosEditor::~VamosEditor() {
+    setLookAndFeel(nullptr);
+}
+
+// ── Component factories ────────────────────────────────────────────────────
 
 VamosEditor::KnobWithLabel VamosEditor::createKnob(const juce::String& paramId,
                                                     const juce::String& labelText)
@@ -101,12 +162,12 @@ VamosEditor::KnobWithLabel VamosEditor::createKnob(const juce::String& paramId,
     KnobWithLabel kwl;
     kwl.slider = std::make_unique<juce::Slider>(juce::Slider::RotaryHorizontalVerticalDrag,
                                                  juce::Slider::NoTextBox);
-    kwl.slider->setLookAndFeel(&getVamosLAF());
+    kwl.slider->setLookAndFeel(&vamosLAF);
     addAndMakeVisible(kwl.slider.get());
 
     kwl.label = std::make_unique<juce::Label>("", labelText);
     kwl.label->setFont(juce::Font(11.0f));
-    kwl.label->setColour(juce::Label::textColourId, kLabelColour);
+    kwl.label->setColour(juce::Label::textColourId, kDimText);
     kwl.label->setJustificationType(juce::Justification::centred);
     addAndMakeVisible(kwl.label.get());
 
@@ -121,10 +182,8 @@ VamosEditor::ComboWithLabel VamosEditor::createCombo(const juce::String& paramId
 {
     ComboWithLabel cwl;
     cwl.combo = std::make_unique<juce::ComboBox>();
-    cwl.combo->setLookAndFeel(&getVamosLAF());
+    cwl.combo->setLookAndFeel(&vamosLAF);
 
-    // Populate combo box items from the AudioParameterChoice before attaching.
-    // ComboBoxAttachment does not auto-populate — the combo must already have items.
     if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(
             processor.apvts.getParameter(paramId))) {
         cwl.combo->addItemList(choiceParam->choices, 1);
@@ -134,7 +193,7 @@ VamosEditor::ComboWithLabel VamosEditor::createCombo(const juce::String& paramId
 
     cwl.label = std::make_unique<juce::Label>("", labelText);
     cwl.label->setFont(juce::Font(11.0f));
-    cwl.label->setColour(juce::Label::textColourId, kLabelColour);
+    cwl.label->setColour(juce::Label::textColourId, kDimText);
     cwl.label->setJustificationType(juce::Justification::centred);
     addAndMakeVisible(cwl.label.get());
 
@@ -144,190 +203,443 @@ VamosEditor::ComboWithLabel VamosEditor::createCombo(const juce::String& paramId
     return cwl;
 }
 
-void VamosEditor::drawBlock(juce::Graphics& g, juce::Rectangle<float> bounds,
-                            const juce::String& label, bool active,
-                            juce::Colour colour)
-{
-    auto alpha = active ? 1.0f : 0.3f;
-    g.setColour(colour.withAlpha(alpha * 0.15f));
-    g.fillRoundedRectangle(bounds, 6.0f);
-    g.setColour(colour.withAlpha(alpha * 0.7f));
-    g.drawRoundedRectangle(bounds, 6.0f, active ? 2.0f : 1.0f);
-    g.setColour(colour.withAlpha(alpha));
-    g.setFont(juce::Font(11.0f));
-    g.drawText(label, bounds, juce::Justification::centred);
+// ── Colour / name helpers ──────────────────────────────────────────────────
+
+juce::Colour VamosEditor::getBlockColour(Block b) const {
+    switch (b) {
+        case Block::Osc1:
+        case Block::Osc2:
+        case Block::Noise:      return kCyan;
+        case Block::Mixer:      return kAmber;
+        case Block::Filter:     return kPink;
+        case Block::Amp:        return kGreen;
+        case Block::Out:        return juce::Colours::white;
+        case Block::Env2:
+        case Block::CycEnv:
+        case Block::LFO:
+        case Block::ModMatrix:  return kViolet;
+        case Block::Drift:      return kDriftYellow;
+    }
+    return kCyan;
 }
 
-void VamosEditor::drawArrow(juce::Graphics& g, float x1, float y1, float x2, float y2) {
-    g.setColour(juce::Colours::grey.withAlpha(0.6f));
-    g.drawArrow(juce::Line<float>(x1, y1, x2, y2), 1.5f, 6.0f, 6.0f);
+juce::String VamosEditor::getBlockName(Block b) const {
+    switch (b) {
+        case Block::Osc1:      return "OSC 1";
+        case Block::Osc2:      return "OSC 2";
+        case Block::Noise:     return "NOISE";
+        case Block::Mixer:     return "MIXER";
+        case Block::Filter:    return "FILTER";
+        case Block::Amp:       return "AMP ENVELOPE";
+        case Block::Out:       return "OUTPUT";
+        case Block::Env2:      return "ENVELOPE 2";
+        case Block::CycEnv:    return "CYCLING ENVELOPE";
+        case Block::LFO:       return "LFO";
+        case Block::ModMatrix: return "MOD MATRIX";
+        case Block::Drift:     return "DRIFT";
+    }
+    return {};
+}
+
+// ── Drawing helpers ────────────────────────────────────────────────────────
+
+void VamosEditor::drawBlock(juce::Graphics& g, juce::Rectangle<float> bounds,
+                             const juce::String& label, bool selected, juce::Colour colour)
+{
+    if (selected) {
+        // Glow halo (layered semi-transparent rects)
+        g.setColour(colour.withAlpha(0.07f));
+        g.fillRoundedRectangle(bounds.expanded(6), 8.0f);
+        g.setColour(colour.withAlpha(0.12f));
+        g.fillRoundedRectangle(bounds.expanded(3), 7.0f);
+
+        // Bright fill
+        g.setColour(colour.withAlpha(0.2f));
+        g.fillRoundedRectangle(bounds, 5.0f);
+
+        // Bright border
+        g.setColour(colour);
+        g.drawRoundedRectangle(bounds, 5.0f, 1.5f);
+
+        // Full-alpha label
+        g.setColour(colour);
+        g.setFont(juce::Font(11.0f).boldened());
+        g.drawText(label, bounds, juce::Justification::centred);
+    } else {
+        // Dim fill
+        g.setColour(colour.withAlpha(0.06f));
+        g.fillRoundedRectangle(bounds, 5.0f);
+
+        // Subtle border
+        g.setColour(colour.withAlpha(0.25f));
+        g.drawRoundedRectangle(bounds, 5.0f, 1.0f);
+
+        // 0.45 alpha label
+        g.setColour(colour.withAlpha(0.45f));
+        g.setFont(juce::Font(11.0f));
+        g.drawText(label, bounds, juce::Justification::centred);
+    }
+}
+
+void VamosEditor::drawNeonLine(juce::Graphics& g, float x1, float y1, float x2, float y2,
+                                juce::Colour colour)
+{
+    // Wide glow layer
+    g.setColour(colour.withAlpha(0.15f));
+    g.drawLine(x1, y1, x2, y2, 4.0f);
+    // Thin bright core
+    g.setColour(colour.withAlpha(0.6f));
+    g.drawLine(x1, y1, x2, y2, 1.5f);
 }
 
 void VamosEditor::drawSignalFlow(juce::Graphics& g) {
-    const float bw = 80.0f, bh = 36.0f, gap = 14.0f;
-    const float startX = 30.0f, topY = 50.0f;
+    blockHitAreas.clear();
 
-    auto osc1Rect = juce::Rectangle<float>(startX, topY, bw, bh);
-    drawBlock(g, osc1Rect, "Osc 1", true, kOscColour);
+    const float bw = 72.0f, bh = 30.0f;
+    const float startX = 30.0f, topY = 40.0f;
+    const float vGap = 8.0f, hGap = 22.0f;
 
-    auto osc2Rect = juce::Rectangle<float>(startX, topY + bh + gap, bw, bh);
-    drawBlock(g, osc2Rect, "Osc 2", true, kOscColour);
+    // ── Source column ──
+    auto osc1Rect  = juce::Rectangle<float>(startX, topY, bw, bh);
+    auto osc2Rect  = juce::Rectangle<float>(startX, topY + bh + vGap, bw, bh);
+    auto noiseRect = juce::Rectangle<float>(startX, topY + 2 * (bh + vGap), bw, bh);
 
-    auto noiseRect = juce::Rectangle<float>(startX, topY + 2 * (bh + gap), bw, bh);
-    drawBlock(g, noiseRect, "Noise", true, kOscColour);
+    drawBlock(g, osc1Rect,  "Osc 1", selectedBlock == Block::Osc1,  kCyan);
+    drawBlock(g, osc2Rect,  "Osc 2", selectedBlock == Block::Osc2,  kCyan);
+    drawBlock(g, noiseRect, "Noise", selectedBlock == Block::Noise, kCyan);
 
-    float mixerX = startX + bw + gap * 2;
-    auto mixerRect = juce::Rectangle<float>(mixerX, topY + bh / 2 + gap / 2, bw, bh);
-    drawBlock(g, mixerRect, "Mixer", true, kMixerColour);
+    blockHitAreas.push_back({Block::Osc1,  osc1Rect});
+    blockHitAreas.push_back({Block::Osc2,  osc2Rect});
+    blockHitAreas.push_back({Block::Noise, noiseRect});
 
-    drawArrow(g, osc1Rect.getRight(), osc1Rect.getCentreY(), mixerRect.getX(), mixerRect.getCentreY() - 8);
-    drawArrow(g, osc2Rect.getRight(), osc2Rect.getCentreY(), mixerRect.getX(), mixerRect.getCentreY());
-    drawArrow(g, noiseRect.getRight(), noiseRect.getCentreY(), mixerRect.getX(), mixerRect.getCentreY() + 8);
+    // ── Mixer ──
+    float mixerX = startX + bw + hGap;
+    auto mixerRect = juce::Rectangle<float>(mixerX, osc2Rect.getY(), bw, bh);
+    drawBlock(g, mixerRect, "Mixer", selectedBlock == Block::Mixer, kAmber);
+    blockHitAreas.push_back({Block::Mixer, mixerRect});
 
-    float filterX = mixerX + bw + gap * 2;
-    auto filterRect = juce::Rectangle<float>(filterX, mixerRect.getY(), bw, bh);
-    drawBlock(g, filterRect, "Filter", true, kFilterColour);
-    drawArrow(g, mixerRect.getRight(), mixerRect.getCentreY(), filterRect.getX(), filterRect.getCentreY());
+    // Neon arrows: sources → mixer
+    drawNeonLine(g, osc1Rect.getRight(),  osc1Rect.getCentreY(),  mixerRect.getX(), mixerRect.getCentreY() - 6, kCyan);
+    drawNeonLine(g, osc2Rect.getRight(),  osc2Rect.getCentreY(),  mixerRect.getX(), mixerRect.getCentreY(),     kCyan);
+    drawNeonLine(g, noiseRect.getRight(), noiseRect.getCentreY(), mixerRect.getX(), mixerRect.getCentreY() + 6, kCyan);
 
-    float ampX = filterX + bw + gap * 2;
-    auto ampRect = juce::Rectangle<float>(ampX, filterRect.getY(), bw, bh);
-    drawBlock(g, ampRect, "Amp", true, kAmpColour);
-    drawArrow(g, filterRect.getRight(), filterRect.getCentreY(), ampRect.getX(), ampRect.getCentreY());
+    // ── Filter ──
+    float filterX = mixerX + bw + hGap;
+    auto filterRect = juce::Rectangle<float>(filterX, osc2Rect.getY(), bw, bh);
+    drawBlock(g, filterRect, "Filter", selectedBlock == Block::Filter, kPink);
+    blockHitAreas.push_back({Block::Filter, filterRect});
+    drawNeonLine(g, mixerRect.getRight(), mixerRect.getCentreY(), filterRect.getX(), filterRect.getCentreY(), kAmber);
 
-    float outX = ampX + bw + gap * 2;
-    auto outRect = juce::Rectangle<float>(outX, ampRect.getY(), 55, bh);
-    drawBlock(g, outRect, "OUT", true, juce::Colours::white);
-    drawArrow(g, ampRect.getRight(), ampRect.getCentreY(), outRect.getX(), outRect.getCentreY());
+    // ── Amp ──
+    float ampX = filterX + bw + hGap;
+    auto ampRect = juce::Rectangle<float>(ampX, osc2Rect.getY(), bw, bh);
+    drawBlock(g, ampRect, "Amp", selectedBlock == Block::Amp, kGreen);
+    blockHitAreas.push_back({Block::Amp, ampRect});
+    drawNeonLine(g, filterRect.getRight(), filterRect.getCentreY(), ampRect.getX(), ampRect.getCentreY(), kPink);
 
-    float modY = topY + 3 * (bh + gap) + 4;
-    float modBw = 70.0f;
+    // ── OUT ──
+    float outX = ampX + bw + hGap;
+    auto outRect = juce::Rectangle<float>(outX, osc2Rect.getY(), 50, bh);
+    drawBlock(g, outRect, "OUT", selectedBlock == Block::Out, juce::Colours::white);
+    blockHitAreas.push_back({Block::Out, outRect});
+    drawNeonLine(g, ampRect.getRight(), ampRect.getCentreY(), outRect.getX(), outRect.getCentreY(), kGreen);
 
-    g.setColour(juce::Colours::grey.withAlpha(0.35f));
-    g.setFont(juce::Font(10.0f));
-    g.drawText("Modulators:", startX, modY - 14, 150, 12, juce::Justification::left);
+    // ── Modulator row ──
+    float modY = noiseRect.getBottom() + 18.0f;
+    float modBw = 62.0f, modGap = 8.0f;
+
+    g.setColour(kDimText);
+    g.setFont(juce::Font(9.0f));
+    g.drawText("MODULATORS", startX, modY - 12, 120, 10, juce::Justification::left);
 
     auto env2Rect = juce::Rectangle<float>(startX, modY, modBw, bh);
-    drawBlock(g, env2Rect, "Env 2", true, kModColour);
+    drawBlock(g, env2Rect, "Env 2", selectedBlock == Block::Env2, kViolet);
+    blockHitAreas.push_back({Block::Env2, env2Rect});
 
-    auto cycRect = juce::Rectangle<float>(startX + modBw + gap, modY, modBw, bh);
-    drawBlock(g, cycRect, "CycEnv", true, kModColour);
+    auto cycRect = juce::Rectangle<float>(startX + modBw + modGap, modY, modBw, bh);
+    drawBlock(g, cycRect, "CycEnv", selectedBlock == Block::CycEnv, kViolet);
+    blockHitAreas.push_back({Block::CycEnv, cycRect});
 
-    auto lfoRect = juce::Rectangle<float>(startX + 2 * (modBw + gap), modY, modBw, bh);
-    drawBlock(g, lfoRect, "LFO", true, kModColour);
+    auto lfoRect = juce::Rectangle<float>(startX + 2 * (modBw + modGap), modY, modBw, bh);
+    drawBlock(g, lfoRect, "LFO", selectedBlock == Block::LFO, kViolet);
+    blockHitAreas.push_back({Block::LFO, lfoRect});
 
-    auto modRect = juce::Rectangle<float>(startX + 3 * (modBw + gap), modY, modBw + 10, bh);
-    drawBlock(g, modRect, "ModMatrix", true, kModColour);
+    auto modMatRect = juce::Rectangle<float>(startX + 3 * (modBw + modGap), modY, modBw + 10, bh);
+    drawBlock(g, modMatRect, "ModMtx", selectedBlock == Block::ModMatrix, kViolet);
+    blockHitAreas.push_back({Block::ModMatrix, modMatRect});
 
-    auto driftRect = juce::Rectangle<float>(startX + 4 * (modBw + gap) + 10, modY, modBw, bh);
-    drawBlock(g, driftRect, "Drift", true, juce::Colour(0xFFFFF176));
+    auto driftRect = juce::Rectangle<float>(startX + 4 * (modBw + modGap) + 10, modY, modBw, bh);
+    drawBlock(g, driftRect, "Drift", selectedBlock == Block::Drift, kDriftYellow);
+    blockHitAreas.push_back({Block::Drift, driftRect});
 
-    g.setColour(juce::Colours::grey.withAlpha(0.2f));
+    // ── Dashed mod connections ──
     float dashLengths[] = {3.0f, 3.0f};
+    g.setColour(kViolet.withAlpha(0.15f));
     g.drawDashedLine(juce::Line<float>(env2Rect.getCentreX(), env2Rect.getY(),
                      filterRect.getCentreX(), filterRect.getBottom()), dashLengths, 2, 1.0f);
     g.drawDashedLine(juce::Line<float>(lfoRect.getCentreX(), lfoRect.getY(),
                      filterRect.getCentreX() + 10, filterRect.getBottom()), dashLengths, 2, 1.0f);
+    g.setColour(kDriftYellow.withAlpha(0.15f));
     g.drawDashedLine(juce::Line<float>(driftRect.getCentreX(), driftRect.getY(),
                      osc1Rect.getCentreX(), osc1Rect.getBottom()), dashLengths, 2, 1.0f);
 
-    float voiceY = modY + bh + gap + 2;
-    g.setColour(juce::Colours::grey.withAlpha(0.35f));
-    g.setFont(juce::Font(10.0f));
-    g.drawText("Voices:", startX, voiceY, 60, 14, juce::Justification::left);
-
+    // ── Voice indicators ──
     const auto& voices = processor.getSynth().getVoices();
+    float voiceX = outRect.getRight() + 24.0f;
+    float voiceBaseY = osc1Rect.getY();
+
+    g.setColour(kDimText);
+    g.setFont(juce::Font(9.0f));
+    g.drawText("VOICES", voiceX, voiceBaseY - 2, 60, 10, juce::Justification::left);
+
     for (int i = 0; i < 8; ++i) {
-        float x = startX + 55 + i * 24;
+        float vx = voiceX + (float)(i % 4) * 20.0f;
+        float vy = voiceBaseY + 12.0f + (float)(i / 4) * 16.0f;
         bool active = voices[i].isActive();
-        g.setColour(active ? kAmpColour : juce::Colour(0xFF333355));
-        g.fillRoundedRectangle(x, voiceY, 18, 12, 3.0f);
-        g.setColour(juce::Colours::white.withAlpha(active ? 0.9f : 0.3f));
-        g.setFont(juce::Font(9.0f));
-        g.drawText(juce::String(i + 1), (int)x, (int)voiceY, 18, 12, juce::Justification::centred);
+        g.setColour(active ? kGreen : juce::Colour(0xFF222244));
+        g.fillRoundedRectangle(vx, vy, 14, 10, 2.0f);
+        g.setColour(juce::Colours::white.withAlpha(active ? 0.9f : 0.2f));
+        g.setFont(juce::Font(8.0f));
+        g.drawText(juce::String(i + 1), (int)vx, (int)vy, 14, 10, juce::Justification::centred);
     }
 }
 
+// ── Paint ──────────────────────────────────────────────────────────────────
+
 void VamosEditor::paint(juce::Graphics& g) {
+    // Background
     g.fillAll(kBackground);
 
-    g.setColour(juce::Colours::white);
-    g.setFont(juce::Font(18.0f).boldened());
-    g.drawText("VAMOS", getLocalBounds().removeFromTop(30), juce::Justification::centred);
+    // Title
+    g.setColour(kText);
+    g.setFont(juce::Font(20.0f).boldened());
+    g.drawText("VAMOS", 0, 6, getWidth(), 24, juce::Justification::centred);
 
-    g.setFont(juce::Font(10.0f));
-    g.setColour(juce::Colours::grey);
-    g.drawText("Phase 7: Parameters + GUI", getLocalBounds().removeFromTop(42), juce::Justification::centred);
-
+    // Signal flow diagram (top section, 0–210)
     drawSignalFlow(g);
 
-    int sectionY = 310;
-    g.setFont(juce::Font(12.0f).boldened());
+    // Accent separator — glowing 3px line at y=210
+    auto accent = getBlockColour(selectedBlock);
+    g.setColour(accent.withAlpha(0.10f));
+    g.fillRect(0.0f, 207.0f, (float)getWidth(), 9.0f);
+    g.setColour(accent);
+    g.fillRect(0.0f, 210.0f, (float)getWidth(), 3.0f);
 
-    g.setColour(kOscColour);
-    g.drawText("OSC 1", 20, sectionY, 120, 16, juce::Justification::left);
-    g.drawText("OSC 2", 175, sectionY, 120, 16, juce::Justification::left);
+    // Panel background (213 → bottom)
+    g.setColour(kPanelBg);
+    g.fillRect(0, 213, getWidth(), getHeight() - 213);
 
-    g.setColour(kMixerColour);
-    g.drawText("MIXER", 330, sectionY, 120, 16, juce::Justification::left);
+    // Block name in panel header
+    g.setColour(accent);
+    g.setFont(juce::Font(14.0f).boldened());
+    g.drawText(getBlockName(selectedBlock), 24, 218, 300, 22, juce::Justification::left);
 
-    g.setColour(kFilterColour);
-    g.drawText("FILTER", 500, sectionY, 120, 16, juce::Justification::left);
+    // "No parameters" for empty blocks
+    if (selectedBlock == Block::Env2 || selectedBlock == Block::CycEnv || selectedBlock == Block::ModMatrix) {
+        g.setColour(kDimText);
+        g.setFont(juce::Font(13.0f));
+        g.drawText("No parameters", 0, 310, getWidth(), 30, juce::Justification::centred);
+    }
 
-    g.setColour(juce::Colours::white);
-    g.drawText("GLOBAL", 720, sectionY, 120, 16, juce::Justification::left);
+    // CRT scan lines — faint horizontal lines every 3px
+    g.setColour(juce::Colours::black.withAlpha(0.07f));
+    for (int sy = 0; sy < getHeight(); sy += 3)
+        g.fillRect(0, sy, getWidth(), 1);
+}
 
-    int envY = 450;
-    g.setColour(kAmpColour);
-    g.drawText("ENVELOPE", 20, envY, 200, 16, juce::Justification::left);
+// ── Block interaction ──────────────────────────────────────────────────────
 
-    g.setColour(kModColour);
-    g.drawText("LFO", 350, envY, 100, 16, juce::Justification::left);
+void VamosEditor::mouseDown(const juce::MouseEvent& e) {
+    auto pos = e.getPosition().toFloat();
+    for (auto& [block, rect] : blockHitAreas) {
+        if (rect.contains(pos)) {
+            showBlockParams(block);
+            return;
+        }
+    }
+}
 
-    g.setColour(juce::Colours::white.withAlpha(0.8f));
-    g.drawText("PERFORMANCE", 540, envY, 200, 16, juce::Justification::left);
+void VamosEditor::showBlockParams(Block b) {
+    selectedBlock = b;
+    vamosLAF.accentColour = getBlockColour(b);
 
-    g.setColour(juce::Colours::grey.withAlpha(0.15f));
-    g.drawLine(20, 308, 880, 308, 1.0f);
-    g.drawLine(20, 448, 880, 448, 1.0f);
+    // ── Hide ALL controls ──
+    auto hideKnob = [](KnobWithLabel& k) {
+        k.slider->setVisible(false);
+        k.label->setVisible(false);
+    };
+    auto hideCombo = [](ComboWithLabel& c) {
+        c.combo->setVisible(false);
+        c.label->setVisible(false);
+    };
+    auto showKnob = [](KnobWithLabel& k) {
+        k.slider->setVisible(true);
+        k.label->setVisible(true);
+    };
+    auto showCombo = [](ComboWithLabel& c) {
+        c.combo->setVisible(true);
+        c.label->setVisible(true);
+    };
+
+    hideCombo(osc1TypeCombo);   hideKnob(osc1ShapeKnob);
+    hideCombo(osc2TypeCombo);   hideKnob(osc2DetuneKnob);
+    hideKnob(osc1GainKnob);    hideKnob(osc2GainKnob);    hideKnob(noiseLevelKnob);
+    hideCombo(filterTypeCombo); hideKnob(filterFreqKnob);  hideKnob(filterResKnob);
+    hideKnob(envAttackKnob);   hideKnob(envDecayKnob);
+    hideKnob(envSustainKnob);  hideKnob(envReleaseKnob);
+    hideCombo(lfoShapeCombo);   hideKnob(lfoRateKnob);
+    hideKnob(volumeKnob);      hideKnob(driftKnob);
+    hideCombo(voiceModeCombo);  hideKnob(glideKnob);
+    hideKnob(transposeKnob);   hideKnob(velModKnob);      hideKnob(bendRangeKnob);
+
+    // ── Show selected block's controls ──
+    switch (b) {
+        case Block::Osc1:
+            showCombo(osc1TypeCombo);
+            showKnob(osc1ShapeKnob);
+            break;
+        case Block::Osc2:
+            showCombo(osc2TypeCombo);
+            showKnob(osc2DetuneKnob);
+            break;
+        case Block::Noise:
+            showKnob(noiseLevelKnob);
+            break;
+        case Block::Mixer:
+            showKnob(osc1GainKnob);
+            showKnob(osc2GainKnob);
+            showKnob(noiseLevelKnob);
+            break;
+        case Block::Filter:
+            showCombo(filterTypeCombo);
+            showKnob(filterFreqKnob);
+            showKnob(filterResKnob);
+            break;
+        case Block::Amp:
+            showKnob(envAttackKnob);
+            showKnob(envDecayKnob);
+            showKnob(envSustainKnob);
+            showKnob(envReleaseKnob);
+            break;
+        case Block::Out:
+            showKnob(volumeKnob);
+            showCombo(voiceModeCombo);
+            showKnob(glideKnob);
+            showKnob(transposeKnob);
+            showKnob(velModKnob);
+            showKnob(bendRangeKnob);
+            break;
+        case Block::LFO:
+            showCombo(lfoShapeCombo);
+            showKnob(lfoRateKnob);
+            break;
+        case Block::Drift:
+            showKnob(driftKnob);
+            break;
+        case Block::Env2:
+        case Block::CycEnv:
+        case Block::ModMatrix:
+            break;  // No parameters
+    }
+
+    layoutParamPanel();
+    repaint();
+}
+
+// ── Layout ─────────────────────────────────────────────────────────────────
+
+void VamosEditor::layoutParamPanel() {
+    const int panelY = 250;
+    const int knobSize = 56;
+    const int comboW = 100, comboH = 24;
+    const int labelH = 16;
+    const int spacing = 16;
+    int cx = getWidth() / 2;
+
+    auto placeKnob = [&](KnobWithLabel& k, int x, int y) {
+        if (k.slider->isVisible()) {
+            k.slider->setBounds(x, y, knobSize, knobSize);
+            k.label->setBounds(x, y + knobSize, knobSize, labelH);
+        }
+    };
+    auto placeCombo = [&](ComboWithLabel& c, int x, int y) {
+        if (c.combo->isVisible()) {
+            c.combo->setBounds(x, y, comboW, comboH);
+            c.label->setBounds(x, y - labelH - 2, comboW, labelH);
+        }
+    };
+
+    switch (selectedBlock) {
+        case Block::Osc1: {
+            int totalW = comboW + spacing + knobSize;
+            int sx = cx - totalW / 2;
+            placeCombo(osc1TypeCombo, sx, panelY + 20);
+            placeKnob(osc1ShapeKnob, sx + comboW + spacing, panelY);
+            break;
+        }
+        case Block::Osc2: {
+            int totalW = comboW + spacing + knobSize;
+            int sx = cx - totalW / 2;
+            placeCombo(osc2TypeCombo, sx, panelY + 20);
+            placeKnob(osc2DetuneKnob, sx + comboW + spacing, panelY);
+            break;
+        }
+        case Block::Noise: {
+            placeKnob(noiseLevelKnob, cx - knobSize / 2, panelY);
+            break;
+        }
+        case Block::Mixer: {
+            int totalW = 3 * knobSize + 2 * spacing;
+            int sx = cx - totalW / 2;
+            placeKnob(osc1GainKnob,   sx, panelY);
+            placeKnob(osc2GainKnob,   sx + knobSize + spacing, panelY);
+            placeKnob(noiseLevelKnob,  sx + 2 * (knobSize + spacing), panelY);
+            break;
+        }
+        case Block::Filter: {
+            int totalW = comboW + spacing + 2 * knobSize + spacing;
+            int sx = cx - totalW / 2;
+            placeCombo(filterTypeCombo, sx, panelY + 20);
+            placeKnob(filterFreqKnob,   sx + comboW + spacing, panelY);
+            placeKnob(filterResKnob,    sx + comboW + 2 * spacing + knobSize, panelY);
+            break;
+        }
+        case Block::Amp: {
+            int totalW = 4 * knobSize + 3 * spacing;
+            int sx = cx - totalW / 2;
+            placeKnob(envAttackKnob,  sx, panelY);
+            placeKnob(envDecayKnob,   sx + (knobSize + spacing), panelY);
+            placeKnob(envSustainKnob, sx + 2 * (knobSize + spacing), panelY);
+            placeKnob(envReleaseKnob, sx + 3 * (knobSize + spacing), panelY);
+            break;
+        }
+        case Block::Out: {
+            int totalW = 5 * knobSize + 4 * spacing;
+            int sx = cx - totalW / 2;
+            placeKnob(volumeKnob,    sx, panelY);
+            placeKnob(glideKnob,     sx + (knobSize + spacing), panelY);
+            placeKnob(transposeKnob, sx + 2 * (knobSize + spacing), panelY);
+            placeKnob(velModKnob,    sx + 3 * (knobSize + spacing), panelY);
+            placeKnob(bendRangeKnob, sx + 4 * (knobSize + spacing), panelY);
+            placeCombo(voiceModeCombo, cx - comboW / 2, panelY + knobSize + labelH + 10);
+            break;
+        }
+        case Block::LFO: {
+            int totalW = comboW + spacing + knobSize;
+            int sx = cx - totalW / 2;
+            placeCombo(lfoShapeCombo, sx, panelY + 20);
+            placeKnob(lfoRateKnob,   sx + comboW + spacing, panelY);
+            break;
+        }
+        case Block::Drift: {
+            placeKnob(driftKnob, cx - knobSize / 2, panelY);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void VamosEditor::resized() {
-    const int knobSize = 50, comboW = 95, comboH = 22, labelH = 14;
-    const int ctrlY = 330, envY = 470;
-
-    auto placeKnob = [&](KnobWithLabel& k, int x, int y) {
-        k.slider->setBounds(x, y, knobSize, knobSize);
-        k.label->setBounds(x, y + knobSize, knobSize, labelH);
-    };
-    auto placeCombo = [&](ComboWithLabel& c, int x, int y) {
-        c.combo->setBounds(x, y + 6, comboW, comboH);
-        c.label->setBounds(x, y - 8, comboW, labelH);
-    };
-
-    placeCombo(osc1TypeCombo, 20, ctrlY);
-    placeKnob(osc1ShapeKnob, 120, ctrlY - 4);
-    placeCombo(osc2TypeCombo, 185, ctrlY);
-    placeKnob(osc2DetuneKnob, 285, ctrlY - 4);
-    placeKnob(osc1GainKnob, 340, ctrlY - 4);
-    placeKnob(osc2GainKnob, 395, ctrlY - 4);
-    placeKnob(noiseLevelKnob, 450, ctrlY - 4);
-    placeCombo(filterTypeCombo, 510, ctrlY);
-    placeKnob(filterFreqKnob, 615, ctrlY - 4);
-    placeKnob(filterResKnob, 670, ctrlY - 4);
-    placeKnob(volumeKnob, 730, ctrlY - 4);
-    placeKnob(driftKnob, 785, ctrlY - 4);
-    placeCombo(voiceModeCombo, 730, ctrlY + 65);
-    placeKnob(envAttackKnob, 20, envY);
-    placeKnob(envDecayKnob, 80, envY);
-    placeKnob(envSustainKnob, 140, envY);
-    placeKnob(envReleaseKnob, 200, envY);
-    placeCombo(lfoShapeCombo, 350, envY + 4);
-    placeKnob(lfoRateKnob, 455, envY);
-
-    // Global row (bottom-right area)
-    int globalY = envY;
-    placeKnob(glideKnob, 540, globalY);
-    placeKnob(transposeKnob, 600, globalY);
-    placeKnob(velModKnob, 660, globalY);
-    placeKnob(bendRangeKnob, 720, globalY);
+    layoutParamPanel();
 }
