@@ -5,18 +5,18 @@ import {
   interpolate,
   useCurrentFrame,
 } from "remotion";
-import { COLORS } from "../lib/colors";
-import { FONT_SANS, FONT_MONO } from "../lib/fonts";
-import { PREMOUNT_FRAMES, STAGGER_OFFSET } from "../lib/timing";
-import { SceneContainer } from "../components/SceneContainer";
-import { SectionTitle } from "../components/SectionTitle";
-import { CodeBlock } from "../components/CodeBlock";
-import { ADSRVisualizer } from "../components/ADSRVisualizer";
-import { KeyPoint } from "../components/KeyPoint";
-import { NeonBox } from "../components/NeonBox";
-import { ENVELOPE_CODE } from "../lib/code-snippets";
-import { SceneNarration } from "../components/SceneNarration";
-import { NARRATION } from "../lib/narration";
+import { COLORS } from "../../lib/colors";
+import { FONT_SANS, FONT_MONO } from "../../lib/fonts";
+import { PREMOUNT_FRAMES, STAGGER_OFFSET } from "../../lib/timing";
+import { SceneContainer } from "../../components/SceneContainer";
+import { SectionTitle } from "../../components/SectionTitle";
+import { CodeBlock } from "../../components/CodeBlock";
+import { ADSRVisualizer } from "../../components/ADSRVisualizer";
+import { KeyPoint } from "../../components/KeyPoint";
+import { NeonBox } from "../../components/NeonBox";
+import { ENVELOPE_CODE } from "../code-snippets";
+import { SceneNarration } from "../../components/SceneNarration";
+import { NARRATION } from "../narration";
 
 export const Envelope: React.FC = () => {
   const frame = useCurrentFrame();
@@ -24,7 +24,7 @@ export const Envelope: React.FC = () => {
   return (
     <SceneContainer sceneIndex={4}>
       {/* Title */}
-      <Sequence durationInFrames={1735} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1747} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="ADSR Envelope"
@@ -35,7 +35,7 @@ export const Envelope: React.FC = () => {
       </Sequence>
 
       {/* ADSR visualization */}
-      <Sequence from={0} durationInFrames={500} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={550} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "200px 80px",
@@ -99,7 +99,7 @@ export const Envelope: React.FC = () => {
       </Sequence>
 
       {/* Overshoot trick explanation */}
-      <Sequence from={500} durationInFrames={673} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={550} durationInFrames={581} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "200px 80px",
@@ -143,7 +143,7 @@ export const Envelope: React.FC = () => {
                 fontSize: 16,
                 color: COLORS.TEXT_PRIMARY,
                 lineHeight: 2.2,
-                opacity: interpolate(frame - 500, [20, 40], [0, 1], {
+                opacity: interpolate(frame - 550, [20, 40], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -170,7 +170,7 @@ export const Envelope: React.FC = () => {
       </Sequence>
 
       {/* Envelope code */}
-      <Sequence from={1173} durationInFrames={562} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={1131} durationInFrames={616} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 720 }}>
             <CodeBlock

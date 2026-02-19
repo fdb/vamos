@@ -6,6 +6,92 @@ Step-by-step process for producing an episode of the Vamos video series.
 
 Synth enthusiasts who know some programming but are not well-versed in DSP or audio coding. Assume familiarity with basic music production concepts (oscillators, filters, envelopes) but not with their implementation details.
 
+## Tone & Content Guidelines
+
+These apply to all episodes and should be followed when writing narration and designing visuals.
+
+### Balance: Entertaining + Useful
+
+- Don't explain every line of code. Focus on the interesting bits that aren't intuitive (e.g., PolyBLEP anti-aliasing, the envelope overshoot trick).
+- When something IS simple, celebrate that: "the mixer literally just adds the signals together" is more valuable than a long explanation.
+- Use the "problem → solution" structure sparingly (max once per episode) to highlight where naive approaches break down and real-world solutions are needed.
+
+### Tone: European Neutral, Not Commercial
+
+- Avoid sales-pitch language. Don't "sell" the approach — explain it.
+  - BAD: "No git submodules, no manual downloads. One command and you're ready."
+  - GOOD: "This avoids the complexity of managing git submodules or downloading frameworks by hand."
+- Avoid overly American enthusiasm. Keep it warm but understated, with a subtle streak of humor.
+  - BAD: "That's it — one voice, one note, one clean signal path."
+  - GOOD: "Nothing fancy — the mixer literally just adds the signals together."
+- Don't use cliffhanger phrasing like "But wait..." or hard sales closes.
+
+### Explaining Concepts
+
+- **Don't assume knowledge of frameworks.** Explain what JUCE is and what it provides on first mention. Same for any tool or library.
+- **Simplify mathematical language.** The audience isn't reading a DSP textbook. Use metaphors and plain language.
+  - BAD: "subtracting a polynomial residual near the transition"
+  - GOOD: "like sanding down a sharp corner"
+- **"Computational cost" not just "cost."** When discussing performance, be specific — CPU cost, memory, processing time.
+- **Preview future episodes** where useful. "We'll add modulation and more complex routing in a later episode, but for now, simplicity is the point." This helps viewers understand why we simplify.
+
+### TTS Pronunciation
+
+The narration text in `narration.ts` should use the **canonical spelling** of all terms (e.g., "JUCE", "GUI", "APVTS"). This text doubles as subtitle source and should read naturally.
+
+Pronunciation corrections for TTS are handled separately by the `generate-voiceover.ts` script, which applies a `PRONUNCIATION_MAP` before sending text to ElevenLabs. This keeps the narration files clean while ensuring correct pronunciation.
+
+**To add a new pronunciation:** edit the `PRONUNCIATION_MAP` in `generate-voiceover.ts`:
+
+```typescript
+const PRONUNCIATION_MAP: Record<string, string> = {
+  JUCE: "Juice",        // framework name
+  GUI: "gooey",         // graphical user interface
+  APVTS: "A P V T S",   // spell out acronym
+  ADSR: "A D S R",      // spell out acronym
+  MIDI: "middy",        // standard pronunciation
+  VST3: "V S T 3",      // spell out
+  PolyBLEP: "Poly Blep", // algorithm name
+  // ...add new terms here
+};
+```
+
+**Why not ElevenLabs Pronunciation Dictionaries?** The phoneme-based dictionaries (IPA/CMU in PLS files) only work with `eleven_flash_v2` / `eleven_turbo_v2` / `eleven_monolingual_v1`. We use `eleven_multilingual_v2`, so text replacement is the reliable approach.
+
+**Numbers and symbols** should still be spelled out directly in the narration text, since both TTS and subtitles benefit from the readable form:
+- "one-point-two" not "1.2", "C++ twenty" not "C++20"
+- "two to the power of one-twelfth" not "2^(1/12)"
+
+### Scene Transitions
+
+- Between major topics, add a brief bridging narration segment that wraps up what was just covered and motivates what's coming next.
+- Don't jump abruptly from one DSP concept to another — give the viewer a moment to absorb.
+
+### Wrap-Up Structure
+
+- End each episode with a recap of what was built, then preview the next episode's content.
+- Be specific about what's coming: "seven waveform types with anti-aliasing, plus a noise generator" is better than "more sound features."
+
+## Episode File Structure
+
+Each episode lives in its own directory under `src/`:
+
+```
+video/src/
+├── components/          # Shared visual components
+├── lib/                 # Shared utilities (colors, fonts, timing constants)
+├── ep01/                # Episode 1
+│   ├── Video.tsx        # TransitionSeries assembling scenes
+│   ├── timing.ts        # Scene durations, transition duration, total
+│   ├── narration.ts     # Narration text + startFrame values
+│   ├── code-snippets.ts # C++ code strings shown in video
+│   └── scenes/          # One file per scene
+├── ep02/                # Episode 2 (same structure)
+├── Root.tsx             # Registers all episode compositions
+├── types.ts             # Shared types (NarrationSegment, SceneNarration)
+└── index.ts             # Remotion entry point
+```
+
 ## Step 1: Rough Structure
 
 Decide what the episode covers and how to explain it.
@@ -14,6 +100,7 @@ Decide what the episode covers and how to explain it.
 - What are the key concepts the audience needs to understand?
 - What's the best order to present them? (Usually: motivation/problem first, then solution, then code)
 - What visualizations would make each concept click? (Waveform animations, signal flow diagrams, before/after comparisons, voice allocation grids, etc.)
+- Where do you need transitional sections between topics?
 
 Output: a bullet-point outline of topics and visualization ideas.
 
@@ -25,6 +112,7 @@ Break the outline into concrete scenes, each with timed sections.
 - Each scene has 2-4 **sections** that show different visual content sequentially
 - Plan one narration segment per section
 - Keep sections focused: one concept per section, one visualization per section
+- Include transitional segments at topic boundaries
 
 Output: a table like:
 
@@ -38,11 +126,11 @@ Output: a table like:
 
 Write the full narration text for each section.
 
-- Conversational but precise tone
+- Conversational but precise tone — follow the Tone & Content Guidelines above
 - Refer to visuals: "Watch as the grid fills up", "Here's the signal flow we're building"
-- Spell out numbers and symbols for TTS: "one-point-two" not "1.2", "C++ twenty" not "C++20"
+- Spell out numbers and symbols for TTS (see pronunciation notes above)
 - Each segment: 10-20 seconds of speech (25-50 words)
-- Store in `src/lib/narration.ts` with placeholder `startFrame` values
+- Store in `src/epNN/narration.ts` with placeholder `startFrame` values (0 for all initially)
 
 ## Step 4: Generate Voiceover Audio
 
@@ -50,15 +138,15 @@ Run the ElevenLabs TTS generation script:
 
 ```bash
 # Requires ELEVENLABS_API_KEY in video/.env
-npx tsx generate-voiceover.ts
+cd video && npx tsx generate-voiceover.ts
 ```
 
-This reads narration segments from `src/lib/narration.ts` and generates MP3 files in `public/voiceover/`. The script skips files that already exist, so it's safe to re-run after adding new segments.
+This reads narration segments from the episode's `narration.ts` and generates MP3 files in `public/voiceover/`. The script skips files that already exist — to regenerate changed segments, delete their MP3 files first.
 
 Voice settings (in `generate-voiceover.ts`):
 - Model: `eleven_multilingual_v2`
 - Voice: configurable via `VOICE_ID` constant
-- Output: MP3 files named `{sceneId}-{segmentIndex}.mp3`
+- Output: MP3 files named `{segmentId}.mp3`
 
 ## Step 5: Measure Audio and Set Timing
 
@@ -77,12 +165,12 @@ Convert durations to frames (multiply by 30 for 30fps) and calculate timing:
 - `startFrame[N]` = `startFrame[N-1]` + `ceil(audioDuration[N-1] * 30)` + 30 (gap)
 - `sceneDuration` = `startFrame[last]` + `ceil(audioDuration[last] * 30)` + 30 (buffer)
 
-Update `src/lib/narration.ts` with computed `startFrame` values.
-Update `src/lib/timing.ts` `SCENE_DURATIONS` with computed scene durations.
+Update `src/epNN/narration.ts` with computed `startFrame` values.
+Update `src/epNN/timing.ts` `SCENE_DURATIONS` with computed scene durations.
 
 ## Step 6: Build Scenes in Remotion
 
-For each scene, create a React component in `src/scenes/`:
+For each scene, create a React component in `src/epNN/scenes/`:
 
 - Use `<Sequence from={startFrame} durationInFrames={sectionDuration}>` for each section
 - Visual sections must be **non-overlapping** (each ends exactly where the next begins)
@@ -92,11 +180,11 @@ For each scene, create a React component in `src/scenes/`:
 ### Visualization Guidelines
 
 - **Code walkthroughs**: Use `<CodeBlock>` with typewriter mode and highlighted lines
-- **Animated diagrams**: `<SignalFlowDiagram>`, `<WaveformVisualizer>`, `<ADSRVisualizer>`, `<VoiceGrid>`
+- **Animated diagrams**: `<SignalFlowDiagram>`, `<WaveformVisualizer>`, `<ADSRVisualizer>`, `<VoiceGrid>`, `<SpectrumVisualizer>`
 - **Key points**: `<KeyPoint>` bullets with staggered `delay` props
 - **Callout boxes**: `<NeonBox>` for formulas, important concepts
 - **Badges**: `<Badge>` for tech labels (C++20, JUCE 8, VST3, etc.)
-- **Before/after comparisons**: Side-by-side visualizations
+- **Before/after comparisons**: Side-by-side visualizations with spectrum views where relevant
 
 ### Animation Rules
 
@@ -108,7 +196,7 @@ For each scene, create a React component in `src/scenes/`:
 ## Step 7: Preview and Iterate
 
 ```bash
-npx remotion studio
+cd video && npx remotion studio
 ```
 
 Scrub through each scene in Remotion Studio:
@@ -116,11 +204,12 @@ Scrub through each scene in Remotion Studio:
 - Verify visual content switches cleanly at section boundaries
 - Verify animations are readable at playback speed
 - Verify code is on screen long enough to read
+- Verify before/after comparisons actually show a visible difference
 
 ## Step 8: Render
 
 ```bash
-npx remotion render Video --output=out/episode.mp4
+cd video && npx remotion render Ep01-Foundation --output=out/ep01.mp4
 ```
 
 Verify: correct duration, 1920x1080, audio and visuals in sync.

@@ -81,14 +81,16 @@ Educational video series in `video/` built with Remotion 4.0 (React-based video 
 ```bash
 cd video && npm install              # Install dependencies
 npx remotion studio                  # Open Remotion Studio for preview
-npx remotion render Video --output=out/episode.mp4  # Render final video
+npx remotion render Ep01-Foundation --output=out/ep01.mp4  # Render episode 1
 ```
 
 ### Video Structure
 
-- `video/src/scenes/` — One file per scene (01-Intro through 09-Outro)
-- `video/src/components/` — Reusable visual components (CodeBlock, WaveformVisualizer, ADSRVisualizer, SignalFlowDiagram, VoiceGrid, etc.)
-- `video/src/lib/` — Colors, fonts, timing, narration text, code snippets, syntax highlighting
+- `video/src/ep01/` — Episode 1 content (Video.tsx, timing.ts, narration.ts, code-snippets.ts, scenes/)
+- `video/src/components/` — Reusable visual components (CodeBlock, WaveformVisualizer, ADSRVisualizer, SignalFlowDiagram, VoiceGrid, SpectrumVisualizer, etc.)
+- `video/src/lib/` — Shared utilities: colors, fonts, shared timing constants, syntax highlighting
+- `video/src/Root.tsx` — Registers all episode compositions
+- `video/src/types.ts` — Shared types (VideoSchema, NarrationSegment, SceneNarration)
 - `video/public/voiceover/` — ElevenLabs TTS MP3 files (gitignored, regenerated via `npx tsx generate-voiceover.ts`)
 
 ### Key Conventions

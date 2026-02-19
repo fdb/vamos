@@ -7,3 +7,15 @@ export const VideoSchema = z.object({
 });
 
 export type VideoProps = z.infer<typeof VideoSchema>;
+
+export type NarrationSegment = {
+  id: string;
+  text: string;
+  /** Frame offset within the scene where this segment's audio should start */
+  startFrame: number;
+};
+
+export type SceneNarration = {
+  sceneId: string;
+  segments: NarrationSegment[];
+};

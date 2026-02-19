@@ -1,6 +1,6 @@
 import React from "react";
 import { Audio, Sequence, staticFile } from "remotion";
-import type { NarrationSegment } from "../lib/narration";
+import type { NarrationSegment } from "../types";
 import { PREMOUNT_FRAMES } from "../lib/timing";
 
 type SceneNarrationProps = {

@@ -5,18 +5,18 @@ import {
   interpolate,
   useCurrentFrame,
 } from "remotion";
-import { COLORS } from "../lib/colors";
-import { FONT_SANS, FONT_MONO } from "../lib/fonts";
-import { PREMOUNT_FRAMES } from "../lib/timing";
-import { SceneContainer } from "../components/SceneContainer";
-import { SectionTitle } from "../components/SectionTitle";
-import { CodeBlock } from "../components/CodeBlock";
-import { SignalFlowDiagram } from "../components/SignalFlowDiagram";
-import { KeyPoint } from "../components/KeyPoint";
-import { NeonBox } from "../components/NeonBox";
-import { VOICE_CODE } from "../lib/code-snippets";
-import { SceneNarration } from "../components/SceneNarration";
-import { NARRATION } from "../lib/narration";
+import { COLORS } from "../../lib/colors";
+import { FONT_SANS, FONT_MONO } from "../../lib/fonts";
+import { PREMOUNT_FRAMES } from "../../lib/timing";
+import { SceneContainer } from "../../components/SceneContainer";
+import { SectionTitle } from "../../components/SectionTitle";
+import { CodeBlock } from "../../components/CodeBlock";
+import { SignalFlowDiagram } from "../../components/SignalFlowDiagram";
+import { KeyPoint } from "../../components/KeyPoint";
+import { NeonBox } from "../../components/NeonBox";
+import { VOICE_CODE } from "../code-snippets";
+import { SceneNarration } from "../../components/SceneNarration";
+import { NARRATION } from "../narration";
 
 export const Voice: React.FC = () => {
   const frame = useCurrentFrame();
@@ -24,7 +24,7 @@ export const Voice: React.FC = () => {
   return (
     <SceneContainer sceneIndex={5}>
       {/* Title */}
-      <Sequence durationInFrames={1200} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1330} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="The Voice"
@@ -35,7 +35,7 @@ export const Voice: React.FC = () => {
       </Sequence>
 
       {/* Signal chain diagram */}
-      <Sequence from={0} durationInFrames={428} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={422} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "160px 40px",
@@ -52,7 +52,7 @@ export const Voice: React.FC = () => {
       </Sequence>
 
       {/* MIDI to frequency */}
-      <Sequence from={428} durationInFrames={343} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={422} durationInFrames={366} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "210px 80px" }}>
           <NeonBox color={COLORS.VIOLET} delay={0} width={700}>
             <div
@@ -96,7 +96,7 @@ export const Voice: React.FC = () => {
       </Sequence>
 
       {/* Voice code */}
-      <Sequence from={771} durationInFrames={429} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={788} durationInFrames={542} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock

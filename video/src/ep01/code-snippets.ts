@@ -159,3 +159,39 @@ export const FILE_TREE_DATA = [
   { path: "src/PluginEditor.cpp", type: "file" as const, depth: 1 },
   { path: "CMakeLists.txt", type: "file" as const, depth: 0 },
 ];
+
+export const APVTS_PARAMS_CODE = `// JUCE Audio Processor Value Tree State
+auto params = std::vector<std::unique_ptr<
+    juce::RangedAudioParameter>>();
+
+params.push_back(std::make_unique<AudioParameterChoice>(
+  "osc1Type", "Osc 1 Type",
+  StringArray{"Saw","Square","Sine","Triangle"}, 0));
+
+params.push_back(std::make_unique<AudioParameterFloat>(
+  "filterFreq", "Filter Frequency",
+  NormalisableRange(20.0f, 20000.0f, 0.1f, 0.3f),
+  1000.0f));
+
+// ... 30+ parameters: oscillators, filter,
+//     envelopes, LFO, modulation, mixing`;
+
+export const SMOOTHED_VALUE_CODE = `// Without smoothing:
+//   knob moves → value jumps → audio click!
+//
+// With SmoothedValue:
+//   knob moves → value ramps over ~10ms → smooth
+
+juce::SmoothedValue<float> volume;
+volume.reset(sampleRate, 0.01);  // 10ms ramp
+
+void processBlock(AudioBuffer<float>& buffer) {
+  volume.setTargetValue(
+    *apvts.getRawParameterValue("volume"));
+
+  for (int i = 0; i < buffer.getNumSamples(); ++i) {
+    float smoothed = volume.getNextValue();
+    // Apply smoothed value to each sample
+    buffer.setSample(0, i, sample * smoothed);
+  }
+}`;

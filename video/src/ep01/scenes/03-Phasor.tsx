@@ -5,18 +5,18 @@ import {
   interpolate,
   useCurrentFrame,
 } from "remotion";
-import { COLORS } from "../lib/colors";
-import { FONT_SANS, FONT_MONO } from "../lib/fonts";
-import { PREMOUNT_FRAMES } from "../lib/timing";
-import { SceneContainer } from "../components/SceneContainer";
-import { SectionTitle } from "../components/SectionTitle";
-import { CodeBlock } from "../components/CodeBlock";
-import { WaveformVisualizer } from "../components/WaveformVisualizer";
-import { KeyPoint } from "../components/KeyPoint";
-import { NeonBox } from "../components/NeonBox";
-import { PHASOR_CODE } from "../lib/code-snippets";
-import { SceneNarration } from "../components/SceneNarration";
-import { NARRATION } from "../lib/narration";
+import { COLORS } from "../../lib/colors";
+import { FONT_SANS, FONT_MONO } from "../../lib/fonts";
+import { PREMOUNT_FRAMES } from "../../lib/timing";
+import { SceneContainer } from "../../components/SceneContainer";
+import { SectionTitle } from "../../components/SectionTitle";
+import { CodeBlock } from "../../components/CodeBlock";
+import { WaveformVisualizer } from "../../components/WaveformVisualizer";
+import { KeyPoint } from "../../components/KeyPoint";
+import { NeonBox } from "../../components/NeonBox";
+import { PHASOR_CODE } from "../code-snippets";
+import { SceneNarration } from "../../components/SceneNarration";
+import { NARRATION } from "../narration";
 
 export const Phasor: React.FC = () => {
   const frame = useCurrentFrame();
@@ -24,7 +24,7 @@ export const Phasor: React.FC = () => {
   return (
     <SceneContainer sceneIndex={2}>
       {/* Title */}
-      <Sequence durationInFrames={1190} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1036} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="The Phasor"
@@ -35,7 +35,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Phase ramp visualization */}
-      <Sequence from={0} durationInFrames={398} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={394} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -108,7 +108,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Code walkthrough */}
-      <Sequence from={398} durationInFrames={340} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={394} durationInFrames={287} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock
@@ -123,7 +123,7 @@ export const Phasor: React.FC = () => {
       </Sequence>
 
       {/* Waveform from phasor */}
-      <Sequence from={738} durationInFrames={452} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={681} durationInFrames={355} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "210px 80px",
@@ -139,7 +139,7 @@ export const Phasor: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 12,
-                opacity: interpolate(frame - 738, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 681, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -163,7 +163,7 @@ export const Phasor: React.FC = () => {
                 fontSize: 20,
                 color: COLORS.TEXT_DIM,
                 marginBottom: 12,
-                opacity: interpolate(frame - 738, [0, 15], [0, 1], {
+                opacity: interpolate(frame - 681, [0, 15], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),

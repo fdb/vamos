@@ -1,7 +1,7 @@
 import React from "react";
 import { TransitionSeries, linearTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
-import { SCENE_DURATIONS, TRANSITION_DURATION } from "./lib/timing";
+import { SCENE_DURATIONS, TRANSITION_DURATION } from "./timing";
 import { Intro } from "./scenes/01-Intro";
 import { ProjectSetup } from "./scenes/02-ProjectSetup";
 import { Phasor } from "./scenes/03-Phasor";
@@ -11,7 +11,7 @@ import { Voice } from "./scenes/06-Voice";
 import { Synth } from "./scenes/07-Synth";
 import { PluginIntegration } from "./scenes/08-PluginIntegration";
 import { Outro } from "./scenes/09-Outro";
-import "./styles.css";
+import "../styles.css";
 
 const transition = (
   <TransitionSeries.Transition

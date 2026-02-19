@@ -1,5 +1,5 @@
 import { writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { NARRATION } from "./src/lib/narration.ts";
+import { NARRATION } from "./src/ep01/narration.ts";
 
 const API_KEY = process.env.ELEVENLABS_API_KEY;
 if (!API_KEY) {
@@ -7,11 +7,34 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-// ElevenLabs voice ID — "Brian" is a clear, professional male voice
+// ElevenLabs voice ID — "Marcus" is a clear, professional male voice
 // You can change this to any voice ID from your ElevenLabs account
-const VOICE_ID = "nPczCjzI2devNBz1zQrb";
+const VOICE_ID = "6WjhCXzqp2hnSqFtrG8P";
 
 const OUTPUT_DIR = "public/voiceover";
+
+// Pronunciation map: technical terms → phonetic spellings for TTS.
+// The narration text in narration.ts stays canonical (good for subtitles).
+// These replacements are applied only when sending text to ElevenLabs.
+const PRONUNCIATION_MAP: Record<string, string> = {
+  JUCE: "Juice",
+  GUI: "gooey",
+  APVTS: "A P V T S",
+  ADSR: "A D S R",
+  MIDI: "middy",
+  VST3: "V S T 3",
+  PolyBLEP: "Poly Blep",
+  polyBLEP: "poly blep",
+};
+
+function applyPronunciations(text: string): string {
+  let result = text;
+  for (const [term, phonetic] of Object.entries(PRONUNCIATION_MAP)) {
+    // Word-boundary-aware replacement to avoid partial matches
+    result = result.replace(new RegExp(`\\b${term}\\b`, "g"), phonetic);
+  }
+  return result;
+}
 
 async function generateSegment(id: string, text: string): Promise<void> {
   const outPath = `${OUTPUT_DIR}/${id}.mp3`;
@@ -21,6 +44,7 @@ async function generateSegment(id: string, text: string): Promise<void> {
     return;
   }
 
+  const ttsText = applyPronunciations(text);
   console.log(`  [gen]  ${id} (${text.length} chars)`);
 
   const response = await fetch(
@@ -33,7 +57,7 @@ async function generateSegment(id: string, text: string): Promise<void> {
         Accept: "audio/mpeg",
       },
       body: JSON.stringify({
-        text,
+        text: ttsText,
         model_id: "eleven_multilingual_v2",
         voice_settings: {
           stability: 0.6,

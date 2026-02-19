@@ -6,12 +6,12 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { COLORS } from "../lib/colors";
-import { FONT_SANS, FONT_MONO } from "../lib/fonts";
-import { SPRING_SMOOTH } from "../lib/timing";
-import { SceneContainer } from "../components/SceneContainer";
-import { SceneNarration } from "../components/SceneNarration";
-import { NARRATION } from "../lib/narration";
+import { COLORS } from "../../lib/colors";
+import { FONT_SANS, FONT_MONO } from "../../lib/fonts";
+import { SPRING_SMOOTH } from "../../lib/timing";
+import { SceneContainer } from "../../components/SceneContainer";
+import { SceneNarration } from "../../components/SceneNarration";
+import { NARRATION } from "../narration";
 
 export const Outro: React.FC = () => {
   const frame = useCurrentFrame();

@@ -5,18 +5,18 @@ import {
   interpolate,
   useCurrentFrame,
 } from "remotion";
-import { COLORS } from "../lib/colors";
-import { FONT_SANS } from "../lib/fonts";
-import { PREMOUNT_FRAMES } from "../lib/timing";
-import { SceneContainer } from "../components/SceneContainer";
-import { SectionTitle } from "../components/SectionTitle";
-import { CodeBlock } from "../components/CodeBlock";
-import { VoiceGrid } from "../components/VoiceGrid";
-import { KeyPoint } from "../components/KeyPoint";
-import { NeonBox } from "../components/NeonBox";
-import { SYNTH_CODE } from "../lib/code-snippets";
-import { SceneNarration } from "../components/SceneNarration";
-import { NARRATION } from "../lib/narration";
+import { COLORS } from "../../lib/colors";
+import { FONT_SANS } from "../../lib/fonts";
+import { PREMOUNT_FRAMES } from "../../lib/timing";
+import { SceneContainer } from "../../components/SceneContainer";
+import { SectionTitle } from "../../components/SectionTitle";
+import { CodeBlock } from "../../components/CodeBlock";
+import { VoiceGrid } from "../../components/VoiceGrid";
+import { KeyPoint } from "../../components/KeyPoint";
+import { NeonBox } from "../../components/NeonBox";
+import { SYNTH_CODE } from "../code-snippets";
+import { SceneNarration } from "../../components/SceneNarration";
+import { NARRATION } from "../narration";
 
 const VOICE_EVENTS = [
   { frame: 30, voice: 0, type: "noteOn" as const, note: "C4" },
@@ -38,7 +38,7 @@ export const Synth: React.FC = () => {
   return (
     <SceneContainer sceneIndex={6}>
       {/* Title */}
-      <Sequence durationInFrames={1270} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={1235} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "60px 80px" }}>
           <SectionTitle
             title="8-Voice Polyphonic Synth"
@@ -49,7 +49,7 @@ export const Synth: React.FC = () => {
       </Sequence>
 
       {/* Voice grid animation */}
-      <Sequence from={0} durationInFrames={851} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={0} durationInFrames={777} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             padding: "200px 80px",
@@ -104,7 +104,7 @@ export const Synth: React.FC = () => {
       </Sequence>
 
       {/* Synth code */}
-      <Sequence from={851} durationInFrames={419} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={777} durationInFrames={458} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill style={{ padding: "200px 80px" }}>
           <div style={{ maxWidth: 700 }}>
             <CodeBlock

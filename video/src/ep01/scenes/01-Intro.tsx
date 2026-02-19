@@ -7,14 +7,14 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { COLORS } from "../lib/colors";
-import { FONT_SANS, FONT_MONO } from "../lib/fonts";
-import { SPRING_SMOOTH, SPRING_BOUNCY, PREMOUNT_FRAMES, STAGGER_OFFSET } from "../lib/timing";
-import { SceneContainer } from "../components/SceneContainer";
-import { Badge } from "../components/Badge";
-import { SignalFlowDiagram } from "../components/SignalFlowDiagram";
-import { SceneNarration } from "../components/SceneNarration";
-import { NARRATION } from "../lib/narration";
+import { COLORS } from "../../lib/colors";
+import { FONT_SANS, FONT_MONO } from "../../lib/fonts";
+import { SPRING_SMOOTH, SPRING_BOUNCY, PREMOUNT_FRAMES, STAGGER_OFFSET } from "../../lib/timing";
+import { SceneContainer } from "../../components/SceneContainer";
+import { Badge } from "../../components/Badge";
+import { SignalFlowDiagram } from "../../components/SignalFlowDiagram";
+import { SceneNarration } from "../../components/SceneNarration";
+import { NARRATION } from "../narration";
 
 export const Intro: React.FC = () => {
   const frame = useCurrentFrame();
@@ -51,7 +51,7 @@ export const Intro: React.FC = () => {
   return (
     <SceneContainer sceneIndex={0} showProgressBar={false}>
       {/* Main title section */}
-      <Sequence durationInFrames={437} premountFor={PREMOUNT_FRAMES}>
+      <Sequence durationInFrames={751} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             justifyContent: "center",
@@ -121,7 +121,7 @@ export const Intro: React.FC = () => {
       </Sequence>
 
       {/* Signal flow preview */}
-      <Sequence from={437} durationInFrames={387} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={751} durationInFrames={347} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             justifyContent: "center",
@@ -137,7 +137,7 @@ export const Intro: React.FC = () => {
                 color: COLORS.TEXT_DIM,
                 textAlign: "center",
                 marginBottom: 30,
-                opacity: interpolate(frame - 437, [0, 20], [0, 1], {
+                opacity: interpolate(frame - 751, [0, 20], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -151,7 +151,7 @@ export const Intro: React.FC = () => {
       </Sequence>
 
       {/* Table of contents */}
-      <Sequence from={824} durationInFrames={346} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={1098} durationInFrames={270} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             justifyContent: "center",
@@ -166,7 +166,7 @@ export const Intro: React.FC = () => {
                 fontWeight: 700,
                 color: COLORS.TEXT_PRIMARY,
                 marginBottom: 30,
-                opacity: interpolate(frame - 825, [0, 20], [0, 1], {
+                opacity: interpolate(frame - 1098, [0, 20], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),
@@ -177,13 +177,13 @@ export const Intro: React.FC = () => {
             {tocItems.map((item, i) => {
               const itemDelay = i * 12;
               const itemOpacity = interpolate(
-                frame - 825,
+                frame - 1098,
                 [itemDelay + 15, itemDelay + 30],
                 [0, 1],
                 { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
               );
               const itemX = interpolate(
-                frame - 825,
+                frame - 1098,
                 [itemDelay + 15, itemDelay + 30],
                 [-20, 0],
                 { extrapolateLeft: "clamp", extrapolateRight: "clamp" }

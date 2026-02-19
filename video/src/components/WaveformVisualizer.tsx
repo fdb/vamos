@@ -3,7 +3,7 @@ import { interpolate, useCurrentFrame, useVideoConfig, spring } from "remotion";
 import { COLORS } from "../lib/colors";
 import { SPRING_SMOOTH } from "../lib/timing";
 
-type WaveformType = "saw" | "sine" | "triangle" | "square" | "phasor";
+type WaveformType = "saw" | "saw-polyblep" | "saw-zoomed" | "saw-zoomed-polyblep" | "sine" | "triangle" | "square" | "phasor";
 
 type WaveformVisualizerProps = {
   type: WaveformType;
@@ -31,6 +31,46 @@ function generateWaveform(
       case "saw":
         values.push(2 * phase - 1);
         break;
+      case "saw-polyblep": {
+        // Apply PolyBLEP anti-aliasing correction
+        const dt = 1 / (numPoints / periods); // normalized increment
+        const naive = 2 * phase - 1;
+        // PolyBLEP correction near discontinuity
+        let blep = 0;
+        if (phase < dt) {
+          const t = phase / dt;
+          blep = t + t - t * t - 1;
+        } else if (phase > 1 - dt) {
+          const t = (phase - 1) / dt;
+          blep = t * t + t + t + 1;
+        }
+        values.push(naive - blep);
+        break;
+      }
+      case "saw-zoomed": {
+        // Zoomed view near the wrap point discontinuity
+        // Map i to a narrow phase range around the wrap (0.85 to 1.15 of one period)
+        const zoomPhase = 0.85 + (i / numPoints) * 0.3;
+        const wrappedPhase = zoomPhase >= 1 ? zoomPhase - 1 : zoomPhase;
+        values.push(2 * wrappedPhase - 1);
+        break;
+      }
+      case "saw-zoomed-polyblep": {
+        const dt = 0.02; // simulate reasonable increment
+        const zoomPhase = 0.85 + (i / numPoints) * 0.3;
+        const wrappedPhase = zoomPhase >= 1 ? zoomPhase - 1 : zoomPhase;
+        const naive = 2 * wrappedPhase - 1;
+        let blep = 0;
+        if (wrappedPhase < dt) {
+          const t = wrappedPhase / dt;
+          blep = t + t - t * t - 1;
+        } else if (wrappedPhase > 1 - dt) {
+          const t = (wrappedPhase - 1) / dt;
+          blep = t * t + t + t + 1;
+        }
+        values.push(naive - blep);
+        break;
+      }
       case "sine":
         values.push(Math.sin(2 * Math.PI * t));
         break;
