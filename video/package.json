@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "studio": "remotion studio",
-    "render": "remotion render Video --output=episode1.mp4",
-    "build": "remotion render Video"
+    "render": "remotion render Ep01-Foundation --output=out/ep01.mp4",
+    "build": "remotion render Ep01-Foundation",
+    "prepare-youtube": "node --strip-types prepare-youtube-video.ts"
   },
   "dependencies": {
     "@remotion/cli": "4.0.242",
@@ -23,6 +24,7 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.7.0",
     "typescript": "^5.6.3"
   }
 }
