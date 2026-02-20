@@ -2,6 +2,7 @@
   "name": "vamos-video",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "studio": "remotion studio",
     "render": "remotion render Ep01-Foundation --output=out/ep01.mp4",

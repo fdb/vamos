@@ -1,24 +1,78 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
-import { NARRATION } from "./src/ep01/narration.ts";
-import { SCENE_DURATIONS, TRANSITION_DURATION } from "./src/ep01/timing.ts";
 import { FPS } from "./src/lib/timing.ts";
+import type { SceneNarration } from "./src/types.ts";
+
+// ─── Episode imports ──────────────────────────────────────────
+import { NARRATION as NARRATION_EP01 } from "./src/ep01/narration.ts";
+import { SCENE_DURATIONS as SCENE_DURATIONS_EP01, TRANSITION_DURATION as TRANSITION_EP01 } from "./src/ep01/timing.ts";
+import { NARRATION as NARRATION_EP02 } from "./src/ep02/narration.ts";
+import { SCENE_DURATIONS as SCENE_DURATIONS_EP02, TRANSITION_DURATION as TRANSITION_EP02 } from "./src/ep02/timing.ts";
+
+// ─── Episode registry ─────────────────────────────────────────
+
+interface EpisodeConfig {
+  number: number;
+  title: string;
+  compositionId: string;
+  thumbnailId: string | null;
+  narration: SceneNarration[];
+  sceneDurations: Record<string, number>;
+  transitionDuration: number;
+  sceneTitles: string[];
+  description: string;
+}
+
+const EPISODES: Record<string, EpisodeConfig> = {
+  ep01: {
+    number: 1,
+    title: "Foundation",
+    compositionId: "Ep01-Foundation",
+    thumbnailId: "Ep01-Thumbnail",
+    narration: NARRATION_EP01,
+    sceneDurations: SCENE_DURATIONS_EP01,
+    transitionDuration: TRANSITION_EP01,
+    sceneTitles: [
+      "Intro",
+      "Project Setup",
+      "The Phasor",
+      "The Oscillator",
+      "ADSR Envelope",
+      "Voice",
+      "Polyphony",
+      "Plugin Integration",
+      "Outro",
+    ],
+    description: `Building a polyphonic synthesizer from scratch in C++20 with JUCE.
+From an empty project to a working 8-voice polyphonic synth plugin —
+phasor, PolyBLEP anti-aliasing, ADSR envelopes, voice allocation,
+and JUCE plugin integration.`,
+  },
+  ep02: {
+    number: 2,
+    title: "Waveforms",
+    compositionId: "Ep02-Waveforms",
+    thumbnailId: null,
+    narration: NARRATION_EP02,
+    sceneDurations: SCENE_DURATIONS_EP02,
+    transitionDuration: TRANSITION_EP02,
+    sceneTitles: [
+      "Intro",
+      "Waveform Gallery",
+      "Rectangle & Pulse Width",
+      "Triangle from Square",
+      "Saturated & Waveshaping",
+      "The Shape Parameter",
+      "Outro",
+    ],
+    description: `Seven waveform types with anti-aliasing and a Shape parameter.
+Pulse width modulation, triangle waves from integrated squares,
+and waveshaping with tanh — expanding the oscillator's tonal range.`,
+  },
+};
 
 const VOICEOVER_DIR = "public/voiceover";
 const OUTPUT_DIR = "out";
-
-// Scene names for chapter titles (order matches SCENE_DURATIONS keys)
-const SCENE_TITLES = [
-  "Intro",
-  "Project Setup",
-  "The Phasor",
-  "The Oscillator",
-  "ADSR Envelope",
-  "Voice",
-  "Polyphony",
-  "Plugin Integration",
-  "Outro",
-];
 
 // ─── Helpers ──────────────────────────────────────────────────
 
@@ -78,27 +132,26 @@ function wrapCue(text: string): string {
 
 // ─── Absolute timestamp calculation ──────────────────────────
 
-const durations = Object.values(SCENE_DURATIONS);
-
 /** Compute absolute start frame for each scene, accounting for transition overlaps */
-function getSceneStartFrames(): number[] {
+function getSceneStartFrames(ep: EpisodeConfig): number[] {
+  const durations = Object.values(ep.sceneDurations);
   const starts: number[] = [0];
   for (let i = 1; i < durations.length; i++) {
-    starts.push(starts[i - 1] + durations[i - 1] - TRANSITION_DURATION);
+    starts.push(starts[i - 1] + durations[i - 1] - ep.transitionDuration);
   }
   return starts;
 }
 
 // ─── VTT generation ──────────────────────────────────────────
 
-function generateVTT(): string {
-  const sceneStarts = getSceneStartFrames();
+function generateVTT(ep: EpisodeConfig): string {
+  const sceneStarts = getSceneStartFrames(ep);
   const cues: string[] = ["WEBVTT", ""];
   let cueIndex = 1;
   const minCueDuration = 1.5;
 
-  for (let sceneIdx = 0; sceneIdx < NARRATION.length; sceneIdx++) {
-    const scene = NARRATION[sceneIdx];
+  for (let sceneIdx = 0; sceneIdx < ep.narration.length; sceneIdx++) {
+    const scene = ep.narration[sceneIdx];
     const sceneStartFrame = sceneStarts[sceneIdx];
 
     for (const segment of scene.segments) {
@@ -150,23 +203,20 @@ function generateVTT(): string {
 
 // ─── Chapter generation ──────────────────────────────────────
 
-function generateChapters(): string {
-  const sceneStarts = getSceneStartFrames();
+function generateChapters(ep: EpisodeConfig): string {
+  const sceneStarts = getSceneStartFrames(ep);
   return sceneStarts
-    .map((startFrame, i) => `${formatChapter(startFrame / FPS)} ${SCENE_TITLES[i]}`)
+    .map((startFrame, i) => `${formatChapter(startFrame / FPS)} ${ep.sceneTitles[i]}`)
     .join("\n");
 }
 
 // ─── Description generation ──────────────────────────────────
 
-function generateDescription(): string {
-  const chapters = generateChapters();
-  return `VAMOS — Episode 1: Foundation
+function generateDescription(ep: EpisodeConfig): string {
+  const chapters = generateChapters(ep);
+  return `VAMOS — Episode ${ep.number}: ${ep.title}
 
-Building a polyphonic synthesizer from scratch in C++20 with JUCE.
-From an empty project to a working 8-voice polyphonic synth plugin —
-phasor, PolyBLEP anti-aliasing, ADSR envelopes, voice allocation,
-and JUCE plugin integration.
+${ep.description}
 
 Chapters:
 ${chapters}
@@ -179,16 +229,43 @@ Source code: https://github.com/fdb/vamos
 
 // ─── Thumbnail rendering ─────────────────────────────────────
 
-function renderThumbnail(): void {
+function renderThumbnail(ep: EpisodeConfig, epId: string): void {
+  if (!ep.thumbnailId) {
+    console.log("No thumbnail composition defined — skipping.");
+    return;
+  }
   console.log("Rendering thumbnail...");
-  execSync(`npx remotion still Ep01-Thumbnail --output=${OUTPUT_DIR}/ep01-thumbnail.png`, {
+  execSync(`npx remotion still ${ep.thumbnailId} --output=${OUTPUT_DIR}/${epId}-thumbnail.png`, {
     stdio: "inherit",
   });
+  console.log(`  Written: ${OUTPUT_DIR}/${epId}-thumbnail.png`);
 }
 
 // ─── Main ────────────────────────────────────────────────────
 
 function main() {
+  const epId = process.argv[2];
+
+  // No argument → list available episodes
+  if (!epId) {
+    console.log("Usage: npm run prepare-youtube <episode>\n");
+    console.log("Available episodes:");
+    for (const [id, ep] of Object.entries(EPISODES)) {
+      console.log(`  ${id}  — Episode ${ep.number}: ${ep.title}`);
+    }
+    process.exit(0);
+  }
+
+  const ep = EPISODES[epId];
+  if (!ep) {
+    console.error(`Unknown episode: ${epId}`);
+    console.log("Available episodes:");
+    for (const [id, config] of Object.entries(EPISODES)) {
+      console.log(`  ${id}  — Episode ${config.number}: ${config.title}`);
+    }
+    process.exit(1);
+  }
+
   // Ensure output dir exists
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -203,7 +280,7 @@ function main() {
   }
 
   // Check all voiceover files exist
-  const allSegments = NARRATION.flatMap((scene) => scene.segments);
+  const allSegments = ep.narration.flatMap((scene) => scene.segments);
   const missing = allSegments.filter(
     (seg) => !existsSync(`${VOICEOVER_DIR}/${seg.id}.mp3`),
   );
@@ -214,26 +291,28 @@ function main() {
   }
 
   // Generate VTT subtitles
+  console.log(`Preparing YouTube assets for Episode ${ep.number}: ${ep.title}\n`);
   console.log("Generating subtitles...");
-  const vtt = generateVTT();
-  writeFileSync(`${OUTPUT_DIR}/ep01.vtt`, vtt);
-  console.log(`  Written: ${OUTPUT_DIR}/ep01.vtt`);
+  const vtt = generateVTT(ep);
+  writeFileSync(`${OUTPUT_DIR}/${epId}.vtt`, vtt);
+  console.log(`  Written: ${OUTPUT_DIR}/${epId}.vtt`);
 
   // Generate YouTube description
   console.log("Generating description...");
-  const description = generateDescription();
-  writeFileSync(`${OUTPUT_DIR}/ep01-description.txt`, description);
-  console.log(`  Written: ${OUTPUT_DIR}/ep01-description.txt`);
+  const description = generateDescription(ep);
+  writeFileSync(`${OUTPUT_DIR}/${epId}-description.txt`, description);
+  console.log(`  Written: ${OUTPUT_DIR}/${epId}-description.txt`);
 
   // Render thumbnail
-  renderThumbnail();
-  console.log(`  Written: ${OUTPUT_DIR}/ep01-thumbnail.png`);
+  renderThumbnail(ep, epId);
 
   // Summary
   console.log("\nYouTube upload artifacts ready:");
-  console.log(`  ${OUTPUT_DIR}/ep01.vtt              — Subtitles`);
-  console.log(`  ${OUTPUT_DIR}/ep01-description.txt  — Description with chapters`);
-  console.log(`  ${OUTPUT_DIR}/ep01-thumbnail.png    — Thumbnail (1280x720)`);
+  console.log(`  ${OUTPUT_DIR}/${epId}.vtt              — Subtitles`);
+  console.log(`  ${OUTPUT_DIR}/${epId}-description.txt  — Description with chapters`);
+  if (ep.thumbnailId) {
+    console.log(`  ${OUTPUT_DIR}/${epId}-thumbnail.png    — Thumbnail (1280x720)`);
+  }
 }
 
 main();
