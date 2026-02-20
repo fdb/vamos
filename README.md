@@ -4,8 +4,8 @@
 
 **Vamos is two things at once.**
 
-A polyphonic synthesizer you can actually play — and an experiment in building it
-in the open, with AI, one episode at a time.
+A polyphonic synthesizer built with AI — and AI-generated video overviews
+that recover the context humans lose when the code writes itself.
 
 <br>
 
@@ -21,6 +21,8 @@ in the open, with AI, one episode at a time.
 <br>
 
 ## Thing one: the synth
+
+When AI writes your code, you stop building a mental model of it — the videos are an experiment in getting that understanding back.
 
 Vamos is a polyphonic software synthesizer plugin written in C++20 with [JUCE](https://juce.com/), inspired by Ableton's Drift. Eight voices, dual oscillators with PolyBLEP anti-aliasing, eight filter types, exponential ADSR envelopes, an LFO, a cycling envelope, and a modulation matrix with flexible routing. It runs as VST3, Audio Unit, and standalone app. It works in your DAW.
 
