@@ -157,14 +157,26 @@ Voice settings (in `generate-voiceover.ts`):
 - Voice: configurable via `VOICE_ID` constant
 - Output: MP3 files named `{segmentId}.mp3`
 
+### Voice Consistency Between Segments
+
+Each segment is a separate ElevenLabs API call. Without context, the voice quality can shift between segments — different intonation, pacing, or acoustic character. The script uses two mechanisms to maintain consistency:
+
+- **`previous_text` / `next_text`**: Adjacent segment text is passed to each API call so the model can match prosody to its surroundings. These go through `applyPronunciations()` so the model sees the same text it would generate.
+- **`previous_request_ids`**: Each API response returns a `request-id` header. Passing it to the next call conditions the new segment on the actual audio of the prior one — the strongest consistency mechanism.
+
+When a segment is skipped (file already exists), the request ID chain resets to `null`. This is expected: we can't stitch to audio we didn't just generate. For best consistency when regenerating, delete all segments for the episode and regenerate them together.
+
 ## Step 5: Measure Audio and Set Timing
 
-Check the actual duration of each generated audio file:
+**This step must be repeated every time audio files are regenerated.** TTS output durations vary between runs — even small text or voice setting changes can shift segment lengths by seconds. If timing values aren't updated after regeneration, narration will drift out of sync with visuals and scenes will start too early or too late.
+
+Measure the actual duration of each generated audio file:
 
 ```bash
-for f in public/voiceover/*.mp3; do
+for f in public/voiceover/NN-*.mp3; do
   duration=$(ffprobe -v quiet -show_entries format=duration -of csv=p=0 "$f")
-  echo "$(basename "$f"): ${duration}s"
+  frames=$(echo "$duration * 30" | bc)
+  echo "$(basename "$f" .mp3): ${duration}s = ${frames} frames"
 done
 ```
 
@@ -231,5 +243,7 @@ Verify: correct duration, 1920x1080, audio and visuals in sync.
 npm run prepare-youtube
 ```
 
-Generates `out/ep01.vtt` (subtitles), `out/ep01-description.txt` (title, description, chapters),
-and `out/ep01-thumbnail.png` (1280x720 thumbnail).
+Generates `out/epNN.vtt` (subtitles), `out/epNN-description.txt` (title, description, chapters),
+and `out/epNN-thumbnail.png` (1280x720 thumbnail).
+
+Subtitles are delivered as VTT files for YouTube — they are **not** baked into the rendered video. The `SceneNarration` component has a `showSubtitles` prop (default: `false`) that can be enabled for previewing narration sync in Remotion Studio, but should remain off for final renders.
