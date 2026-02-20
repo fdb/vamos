@@ -1,5 +1,19 @@
 import { writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { NARRATION } from "./src/ep01/narration.ts";
+import { NARRATION as NARRATION_EP01 } from "./src/ep01/narration.ts";
+import { NARRATION as NARRATION_EP02 } from "./src/ep02/narration.ts";
+
+const EPISODES: Record<string, typeof NARRATION_EP01> = {
+  "1": NARRATION_EP01,
+  "2": NARRATION_EP02,
+};
+
+const episodeArg = process.argv[2];
+if (!episodeArg || !EPISODES[episodeArg]) {
+  console.error(`Usage: npx tsx generate-voiceover.ts <episode>\n  Available: ${Object.keys(EPISODES).join(", ")}`);
+  process.exit(1);
+}
+
+const NARRATION = EPISODES[episodeArg];
 
 const API_KEY = process.env.ELEVENLABS_API_KEY;
 if (!API_KEY) {
@@ -26,6 +40,7 @@ const PRONUNCIATION_MAP: Record<string, string> = {
   VST3: "V S T 3",
   PolyBLEP: "Poly Blep",
   polyBLEP: "poly blep",
+  tanh: "tanch",
 };
 
 function applyPronunciations(text: string): string {
@@ -37,12 +52,18 @@ function applyPronunciations(text: string): string {
   return result;
 }
 
-async function generateSegment(id: string, text: string): Promise<void> {
+async function generateSegment(
+  id: string,
+  text: string,
+  previousText: string | null,
+  nextText: string | null,
+  previousRequestId: string | null,
+): Promise<string | null> {
   const outPath = `${OUTPUT_DIR}/${id}.mp3`;
 
   if (existsSync(outPath)) {
     console.log(`  [skip] ${id} (already exists)`);
-    return;
+    return null;
   }
 
   const ttsText = applyPronunciations(text);
@@ -65,6 +86,9 @@ async function generateSegment(id: string, text: string): Promise<void> {
           similarity_boost: 0.75,
           style: 0.2,
         },
+        previous_text: previousText ? applyPronunciations(previousText) : undefined,
+        next_text: nextText ? applyPronunciations(nextText) : undefined,
+        previous_request_ids: previousRequestId ? [previousRequestId] : undefined,
       }),
     }
   );
@@ -74,9 +98,13 @@ async function generateSegment(id: string, text: string): Promise<void> {
     throw new Error(`ElevenLabs API error for ${id}: ${response.status} ${err}`);
   }
 
+  const requestId = response.headers.get("request-id");
+
   const audioBuffer = Buffer.from(await response.arrayBuffer());
   writeFileSync(outPath, audioBuffer);
   console.log(`  [done] ${id} (${(audioBuffer.length / 1024).toFixed(0)} KB)`);
+
+  return requestId;
 }
 
 async function main() {
@@ -90,8 +118,12 @@ async function main() {
 
   console.log(`Generating ${allSegments.length} voiceover segments...\n`);
 
-  for (const seg of allSegments) {
-    await generateSegment(seg.id, seg.text);
+  let previousRequestId: string | null = null;
+  for (let i = 0; i < allSegments.length; i++) {
+    const seg = allSegments[i];
+    const prevText = i > 0 ? allSegments[i - 1].text : null;
+    const nextText = i < allSegments.length - 1 ? allSegments[i + 1].text : null;
+    previousRequestId = await generateSegment(seg.id, seg.text, prevText, nextText, previousRequestId);
     // Small delay to respect rate limits
     await new Promise((r) => setTimeout(r, 500));
   }
