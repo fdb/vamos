@@ -141,13 +141,67 @@ Write the full narration text for each section.
 - Each segment: 10-20 seconds of speech (25-50 words)
 - Store in `src/epNN/narration.ts` with placeholder `startFrame` values (0 for all initially)
 
-## Step 4: Generate Voiceover Audio
+## Step 4: Build Scenes and Mute Review
 
-Run the ElevenLabs TTS generation script:
+Build the Remotion scenes **before** generating TTS audio. This avoids burning API credits on narration text that will change during visual iteration.
+
+### 4a: Build Scenes
+
+For each scene, create a React component in `src/epNN/scenes/`:
+
+- Use `<Sequence from={startFrame} durationInFrames={sectionDuration}>` for each section
+- Visual sections must be **non-overlapping** (each ends exactly where the next begins)
+- Title/header Sequence can span the full scene (positioned at top, doesn't overlap content below)
+- Use `<SceneNarration segments={NARRATION[sceneIndex].segments} />` to wire audio
+- Use estimated `startFrame` values for now (rough word count × 4 frames/word is a reasonable estimate)
+
+#### Visualization Guidelines
+
+- **Show, don't tell.** If a concept can be visualized, visualize it — even if it needs a custom component. A spectrum showing aliased energy above the Nyquist line makes the abstract concept concrete in a way that narration alone cannot. Visuals and narration should reinforce each other: the viewer sees what they're hearing about.
+- **Time visual reveals to the narration.** A visualization is most effective when it appears at the exact moment the narration references it. If it comes too early, the viewer is processing visuals and audio about different things simultaneously. Calculate the `delay` prop so the visual lands on the relevant phrase, not at the start of the segment.
+- **Code walkthroughs**: Use `<CodeBlock>` with typewriter mode and highlighted lines
+- **Animated diagrams**: `<SignalFlowDiagram>`, `<WaveformVisualizer>`, `<ADSRVisualizer>`, `<VoiceGrid>`, `<SpectrumVisualizer>`
+- **Key points**: `<KeyPoint>` bullets with staggered `delay` props
+- **Callout boxes**: `<NeonBox>` for formulas, important concepts
+- **Badges**: `<Badge>` for tech labels (C++20, JUCE 8, VST3, etc.)
+- **Before/after comparisons**: Side-by-side visualizations with spectrum views where relevant
+
+#### Animation Rules
+
+- All animations via `useCurrentFrame()` + `interpolate()` — never CSS transitions
+- Spring configs: `SPRING_SMOOTH` (damping: 200) for titles, `SPRING_BOUNCY` (damping: 12) for diagram blocks
+- All `<Sequence>` components get `premountFor={30}` to prevent stuttering
+- Frame offsets in animations must match their parent Sequence's `from` value
+
+### 4b: Render Mute Review Video
+
+Render a **mute** version of the video with burned-in captions for review. This lets you read the narration text while watching the visuals, without spending money on TTS.
+
+```bash
+# Enable burned-in subtitles, disable audio
+# In each scene: <SceneNarration segments={...} showSubtitles={true} playAudio={false} />
+cd video && npx remotion render EpNN-Title --output=out/epNN-mute.mp4
+```
+
+To enable captions for the mute render, pass `showSubtitles={true} playAudio={false}` to all `<SceneNarration>` components. (The default is `showSubtitles={false} playAudio={true}` for final renders.)
+
+### 4c: Review and Iterate
+
+Watch the mute video and check:
+- Does the narration text make sense alongside the visuals?
+- Are visual reveals timed well relative to the text that references them?
+- Is any segment too long or too short for its visual content?
+- Does the flow between scenes feel natural?
+
+Adjust narration text, timing estimates, and visualizations. Re-render the mute video as needed. This loop is free — no API calls.
+
+## Step 5: Generate Voiceover Audio
+
+Once the narration text and visuals are stable, generate TTS audio.
 
 ```bash
 # Requires ELEVENLABS_API_KEY in video/.env
-cd video && npx tsx generate-voiceover.ts
+cd video && npx tsx generate-voiceover.ts <episode>
 ```
 
 This reads narration segments from the episode's `narration.ts` and generates MP3 files in `public/voiceover/`. The script skips files that already exist — to regenerate changed segments, delete their MP3 files first.
@@ -166,7 +220,7 @@ Each segment is a separate ElevenLabs API call. Without context, the voice quali
 
 When a segment is skipped (file already exists), the request ID chain resets to `null`. This is expected: we can't stitch to audio we didn't just generate. For best consistency when regenerating, delete all segments for the episode and regenerate them together.
 
-## Step 5: Measure Audio and Set Timing
+## Step 6: Measure Audio and Set Final Timing
 
 **This step must be repeated every time audio files are regenerated.** TTS output durations vary between runs — even small text or voice setting changes can shift segment lengths by seconds. If timing values aren't updated after regeneration, narration will drift out of sync with visuals and scenes will start too early or too late.
 
@@ -189,34 +243,9 @@ Convert durations to frames (multiply by 30 for 30fps) and calculate timing:
 Update `src/epNN/narration.ts` with computed `startFrame` values.
 Update `src/epNN/timing.ts` `SCENE_DURATIONS` with computed scene durations.
 
-## Step 6: Build Scenes in Remotion
+At this point, switch `SceneNarration` back to the defaults (`showSubtitles={false}`, `playAudio={true}`) — or simply remove the explicit props, since the defaults are correct for final renders.
 
-For each scene, create a React component in `src/epNN/scenes/`:
-
-- Use `<Sequence from={startFrame} durationInFrames={sectionDuration}>` for each section
-- Visual sections must be **non-overlapping** (each ends exactly where the next begins)
-- Title/header Sequence can span the full scene (positioned at top, doesn't overlap content below)
-- Use `<SceneNarration segments={NARRATION[sceneIndex].segments} />` to wire audio
-
-### Visualization Guidelines
-
-- **Show, don't tell.** If a concept can be visualized, visualize it — even if it needs a custom component. A spectrum showing aliased energy above the Nyquist line makes the abstract concept concrete in a way that narration alone cannot. Visuals and narration should reinforce each other: the viewer sees what they're hearing about.
-- **Time visual reveals to the narration.** A visualization is most effective when it appears at the exact moment the narration references it. If it comes too early, the viewer is processing visuals and audio about different things simultaneously. Calculate the `delay` prop so the visual lands on the relevant phrase, not at the start of the segment.
-- **Code walkthroughs**: Use `<CodeBlock>` with typewriter mode and highlighted lines
-- **Animated diagrams**: `<SignalFlowDiagram>`, `<WaveformVisualizer>`, `<ADSRVisualizer>`, `<VoiceGrid>`, `<SpectrumVisualizer>`
-- **Key points**: `<KeyPoint>` bullets with staggered `delay` props
-- **Callout boxes**: `<NeonBox>` for formulas, important concepts
-- **Badges**: `<Badge>` for tech labels (C++20, JUCE 8, VST3, etc.)
-- **Before/after comparisons**: Side-by-side visualizations with spectrum views where relevant
-
-### Animation Rules
-
-- All animations via `useCurrentFrame()` + `interpolate()` — never CSS transitions
-- Spring configs: `SPRING_SMOOTH` (damping: 200) for titles, `SPRING_BOUNCY` (damping: 12) for diagram blocks
-- All `<Sequence>` components get `premountFor={30}` to prevent stuttering
-- Frame offsets in animations must match their parent Sequence's `from` value
-
-## Step 7: Preview and Iterate
+## Step 7: Preview with Audio
 
 ```bash
 cd video && npx remotion studio
@@ -232,7 +261,7 @@ Scrub through each scene in Remotion Studio:
 ## Step 8: Render
 
 ```bash
-cd video && npx remotion render Ep01-Foundation --output=out/ep01.mp4
+cd video && npx remotion render EpNN-Title --output=out/epNN.mp4
 ```
 
 Verify: correct duration, 1920x1080, audio and visuals in sync.
@@ -246,4 +275,4 @@ npm run prepare-youtube
 Generates `out/epNN.vtt` (subtitles), `out/epNN-description.txt` (title, description, chapters),
 and `out/epNN-thumbnail.png` (1280x720 thumbnail).
 
-Subtitles are delivered as VTT files for YouTube — they are **not** baked into the rendered video. The `SceneNarration` component has a `showSubtitles` prop (default: `false`) that can be enabled for previewing narration sync in Remotion Studio, but should remain off for final renders.
+Subtitles are delivered as VTT files for YouTube — they are **not** baked into the rendered video.
