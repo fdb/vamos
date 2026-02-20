@@ -4,13 +4,19 @@ import { COLORS } from "../lib/colors";
 import { FONT_MONO } from "../lib/fonts";
 import { SPRING_SMOOTH } from "../lib/timing";
 
+type SpectrumMode = "aliased" | "clean" | "white-noise" | "pink-noise" | "detuned-saw";
+
 type SpectrumVisualizerProps = {
-  mode: "aliased" | "clean";
+  mode: SpectrumMode;
   width?: number;
   height?: number;
   delay?: number;
   color?: string;
   numBars?: number;
+  /** Hide the Nyquist line (useful for noise spectra) */
+  hideNyquist?: boolean;
+  /** Color for Osc2 bars in detuned-saw mode */
+  secondaryColor?: string;
 };
 
 // Deterministic pseudo-random values for aliased energy above Nyquist.
@@ -20,9 +26,37 @@ const ALIASED_AMPLITUDES = [
 ];
 
 function generateSpectrum(
-  mode: "aliased" | "clean",
+  mode: SpectrumMode,
   numBars: number
 ): number[] {
+  // Noise spectrum modes
+  if (mode === "white-noise") {
+    // White noise: equal energy at all frequencies (flat spectrum)
+    return Array(numBars).fill(0.6);
+  }
+  if (mode === "pink-noise") {
+    // Pink noise: -3dB/octave rolloff (energy ∝ 1/f)
+    const bars: number[] = [];
+    for (let i = 0; i < numBars; i++) {
+      const f = i + 1;
+      bars.push(0.8 / Math.sqrt(f));
+    }
+    return bars;
+  }
+
+  // Detuned-saw: paired bars (Osc1 + Osc2) at each harmonic
+  if (mode === "detuned-saw") {
+    const numHarmonics = Math.floor(numBars / 2);
+    const bars: number[] = [];
+    for (let i = 0; i < numHarmonics; i++) {
+      const harmonic = i + 1;
+      const amp = 1 / harmonic;
+      bars.push(amp);  // Osc1
+      bars.push(amp * 0.9);  // Osc2 (slightly lower — visually distinct)
+    }
+    return bars;
+  }
+
   const nyquistBar = Math.floor(numBars * 0.625); // ~bar 20 of 32
   const bars: number[] = [];
 
@@ -51,6 +85,8 @@ export const SpectrumVisualizer: React.FC<SpectrumVisualizerProps> = ({
   delay = 0,
   color = COLORS.CYAN,
   numBars = 32,
+  hideNyquist = false,
+  secondaryColor,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -98,10 +134,14 @@ export const SpectrumVisualizer: React.FC<SpectrumVisualizerProps> = ({
           });
 
           const barHeight = amplitude * plotH * barReveal;
+          const isNoiseMode = mode === "white-noise" || mode === "pink-noise";
           const isAboveNyquist = i >= nyquistBar;
-          const barColor = isAboveNyquist && mode === "aliased"
-            ? COLORS.PINK
-            : color;
+          const isDetunedSecondary = mode === "detuned-saw" && i % 2 === 1 && secondaryColor;
+          const barColor = isDetunedSecondary
+            ? secondaryColor
+            : !isNoiseMode && isAboveNyquist && mode === "aliased"
+              ? COLORS.PINK
+              : color;
 
           return (
             <div
@@ -119,38 +159,40 @@ export const SpectrumVisualizer: React.FC<SpectrumVisualizerProps> = ({
       </div>
 
       {/* Nyquist dashed line */}
-      <svg
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width,
-          height,
-          pointerEvents: "none",
-        }}
-      >
-        <line
-          x1={nyquistX}
-          y1={padding.top}
-          x2={nyquistX}
-          y2={padding.top + plotH}
-          stroke={COLORS.TEXT_DIM}
-          strokeWidth={1}
-          strokeDasharray="4 4"
-          opacity={0.7}
-        />
-        <text
-          x={nyquistX}
-          y={padding.top - 2}
-          fontSize={11}
-          fill={COLORS.TEXT_DIM}
-          textAnchor="middle"
-          fontFamily={FONT_MONO}
-          opacity={0.7}
+      {!hideNyquist && (
+        <svg
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width,
+            height,
+            pointerEvents: "none",
+          }}
         >
-          Nyquist
-        </text>
-      </svg>
+          <line
+            x1={nyquistX}
+            y1={padding.top}
+            x2={nyquistX}
+            y2={padding.top + plotH}
+            stroke={COLORS.TEXT_DIM}
+            strokeWidth={1}
+            strokeDasharray="4 4"
+            opacity={0.7}
+          />
+          <text
+            x={nyquistX}
+            y={padding.top - 2}
+            fontSize={11}
+            fill={COLORS.TEXT_DIM}
+            textAnchor="middle"
+            fontFamily={FONT_MONO}
+            opacity={0.7}
+          >
+            Nyquist
+          </text>
+        </svg>
+      )}
 
       {/* X axis label */}
       <div

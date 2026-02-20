@@ -6,7 +6,8 @@ import { SPRING_SMOOTH } from "../lib/timing";
 type WaveformType =
   | "saw" | "saw-polyblep" | "saw-zoomed" | "saw-zoomed-polyblep"
   | "sine" | "triangle" | "square" | "phasor"
-  | "rectangle" | "pulse" | "sharktooth" | "saturated";
+  | "rectangle" | "pulse" | "sharktooth" | "saturated"
+  | "white-noise" | "pink-noise";
 
 type WaveformVisualizerProps = {
   type: WaveformType;
@@ -17,23 +18,34 @@ type WaveformVisualizerProps = {
   color?: string;
   strokeWidth?: number;
   periods?: number;
-  overlay?: { type: WaveformType; color: string };
+  overlay?: { type: WaveformType; color: string; phaseOffset?: number };
   /** Shape parameter (0-1) for waveform morphing. Controls pulse width, drive, etc. */
   shapeValue?: number;
   /** Optional label displayed below the waveform */
   label?: string;
 };
 
+/** Seeded xorshift32 PRNG — matches the production Noise.cpp algorithm */
+function xorshift32(state: number): { value: number; next: number } {
+  state ^= state << 13;
+  state ^= state >>> 17;
+  state ^= state << 5;
+  // Convert to float in [-1, 1]
+  const value = ((state | 0) / 2147483648);
+  return { value, next: state };
+}
+
 function generateWaveform(
   type: WaveformType,
   numPoints: number,
   periods: number,
-  shapeValue: number = 0
+  shapeValue: number = 0,
+  phaseOffset: number = 0
 ): number[] {
   const values: number[] = [];
   for (let i = 0; i < numPoints; i++) {
-    const t = (i / numPoints) * periods;
-    const phase = t % 1;
+    const t = (i / numPoints) * periods + phaseOffset;
+    const phase = ((t % 1) + 1) % 1;
 
     switch (type) {
       case "saw":
@@ -120,8 +132,42 @@ function generateWaveform(
         values.push(Math.tanh(drive * saw));
         break;
       }
+      case "white-noise":
+      case "pink-noise":
+        // Handled below (needs stateful generation)
+        break;
     }
   }
+
+  // Noise types need stateful generation outside the per-sample switch
+  if (type === "white-noise" || type === "pink-noise") {
+    values.length = 0;
+    let rng = 0x5EED1234; // fixed seed for deterministic renders
+    // Pink filter state (Paul Kellet coefficients)
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+
+    for (let i = 0; i < numPoints; i++) {
+      const r = xorshift32(rng);
+      rng = r.next;
+      const white = r.value;
+
+      if (type === "white-noise") {
+        values.push(white);
+      } else {
+        // Paul Kellet's pink noise filter
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        const pink = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+        values.push(Math.max(-1, Math.min(1, pink)));
+      }
+    }
+  }
+
   return values;
 }
 
@@ -177,7 +223,7 @@ export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
   const visibleLength = traceMode ? reveal * totalLength : totalLength;
 
   const overlayValues = overlay
-    ? generateWaveform(overlay.type, numPoints, periods, shapeValue)
+    ? generateWaveform(overlay.type, numPoints, periods, shapeValue, overlay.phaseOffset ?? 0)
     : null;
   const overlayPath = overlayValues
     ? valuesToPath(overlayValues, width, height)
