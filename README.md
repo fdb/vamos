@@ -100,4 +100,4 @@ Both use Catch2 v3. Run a specific test by name or tag:
 
 ## License
 
-This project is not yet licensed for distribution. Source code is provided for educational purposes.
+MIT — see [LICENSE](LICENSE) for details.
