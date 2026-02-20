@@ -8,6 +8,8 @@ import { NARRATION as NARRATION_EP01 } from "./src/ep01/narration.ts";
 import { SCENE_DURATIONS as SCENE_DURATIONS_EP01, TRANSITION_DURATION as TRANSITION_EP01 } from "./src/ep01/timing.ts";
 import { NARRATION as NARRATION_EP02 } from "./src/ep02/narration.ts";
 import { SCENE_DURATIONS as SCENE_DURATIONS_EP02, TRANSITION_DURATION as TRANSITION_EP02 } from "./src/ep02/timing.ts";
+import { NARRATION as NARRATION_EP03 } from "./src/ep03/narration.ts";
+import { SCENE_DURATIONS as SCENE_DURATIONS_EP03, TRANSITION_DURATION as TRANSITION_EP03 } from "./src/ep03/timing.ts";
 
 // ─── Episode registry ─────────────────────────────────────────
 
@@ -68,6 +70,25 @@ and JUCE plugin integration.`,
     description: `Seven waveform types with anti-aliasing and a Shape parameter.
 Pulse width modulation, triangle waves from integrated squares,
 and waveshaping with tanh — expanding the oscillator's tonal range.`,
+  },
+  ep03: {
+    number: 3,
+    title: "Noise, Mixer & Osc2",
+    compositionId: "Ep03-NoiseMixer",
+    thumbnailId: null,
+    narration: NARRATION_EP03,
+    sceneDurations: SCENE_DURATIONS_EP03,
+    transitionDuration: TRANSITION_EP03,
+    sceneTitles: [
+      "Intro",
+      "Oscillator 2",
+      "Noise",
+      "Mixer",
+      "Outro",
+    ],
+    description: `Completing the sound source architecture — a second oscillator
+with transpose and detune, white and pink noise generators,
+and a mixer to blend all three sources into the filter.`,
   },
 };
 
