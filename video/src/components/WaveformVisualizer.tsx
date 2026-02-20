@@ -3,7 +3,10 @@ import { interpolate, useCurrentFrame, useVideoConfig, spring } from "remotion";
 import { COLORS } from "../lib/colors";
 import { SPRING_SMOOTH } from "../lib/timing";
 
-type WaveformType = "saw" | "saw-polyblep" | "saw-zoomed" | "saw-zoomed-polyblep" | "sine" | "triangle" | "square" | "phasor";
+type WaveformType =
+  | "saw" | "saw-polyblep" | "saw-zoomed" | "saw-zoomed-polyblep"
+  | "sine" | "triangle" | "square" | "phasor"
+  | "rectangle" | "pulse" | "sharktooth" | "saturated";
 
 type WaveformVisualizerProps = {
   type: WaveformType;
@@ -15,12 +18,17 @@ type WaveformVisualizerProps = {
   strokeWidth?: number;
   periods?: number;
   overlay?: { type: WaveformType; color: string };
+  /** Shape parameter (0-1) for waveform morphing. Controls pulse width, drive, etc. */
+  shapeValue?: number;
+  /** Optional label displayed below the waveform */
+  label?: string;
 };
 
 function generateWaveform(
   type: WaveformType,
   numPoints: number,
-  periods: number
+  periods: number,
+  shapeValue: number = 0
 ): number[] {
   const values: number[] = [];
   for (let i = 0; i < numPoints; i++) {
@@ -83,6 +91,35 @@ function generateWaveform(
       case "phasor":
         values.push(phase);
         break;
+      case "rectangle": {
+        // PWM square: shape controls pulse width from 50% to 99%
+        const pw = 0.5 + shapeValue * 0.49;
+        values.push(phase < pw ? 1 : -1);
+        break;
+      }
+      case "pulse": {
+        // Narrow pulse: shape controls width from 5% to 45%
+        const pw = 0.05 + shapeValue * 0.40;
+        values.push(phase < pw ? 1 : -1);
+        break;
+      }
+      case "sharktooth": {
+        // Asymmetric triangle: shape moves the peak position
+        const midpoint = 0.1 + shapeValue * 0.8;
+        if (phase < midpoint) {
+          values.push(2 * phase / midpoint - 1);
+        } else {
+          values.push(1 - 2 * (phase - midpoint) / (1 - midpoint));
+        }
+        break;
+      }
+      case "saturated": {
+        // tanh waveshaping on saw: shape controls drive (1.5x to 6x)
+        const saw = 2 * phase - 1;
+        const drive = 1.5 + shapeValue * 4.5;
+        values.push(Math.tanh(drive * saw));
+        break;
+      }
     }
   }
   return values;
@@ -118,6 +155,8 @@ export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
   strokeWidth = 2.5,
   periods = 3,
   overlay,
+  shapeValue = 0,
+  label,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -130,7 +169,7 @@ export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
     durationInFrames: 60,
   });
 
-  const values = generateWaveform(type, numPoints, periods);
+  const values = generateWaveform(type, numPoints, periods, shapeValue);
   const path = valuesToPath(values, width, height);
 
   // Calculate path length for trace animation
@@ -138,14 +177,16 @@ export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
   const visibleLength = traceMode ? reveal * totalLength : totalLength;
 
   const overlayValues = overlay
-    ? generateWaveform(overlay.type, numPoints, periods)
+    ? generateWaveform(overlay.type, numPoints, periods, shapeValue)
     : null;
   const overlayPath = overlayValues
     ? valuesToPath(overlayValues, width, height)
     : null;
 
+  const svgHeight = label ? height + 28 : height;
+
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+    <svg width={width} height={svgHeight} viewBox={`0 0 ${width} ${svgHeight}`}>
       {/* Grid lines */}
       <line
         x1={20}
@@ -213,6 +254,21 @@ export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
         strokeDasharray={totalLength}
         strokeDashoffset={totalLength - visibleLength}
       />
+
+      {/* Optional label */}
+      {label && (
+        <text
+          x={width / 2}
+          y={height + 20}
+          fontSize={14}
+          fill={color}
+          textAnchor="middle"
+          fontFamily="JetBrains Mono, monospace"
+          opacity={reveal}
+        >
+          {label}
+        </text>
+      )}
     </svg>
   );
 };
