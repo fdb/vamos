@@ -10,6 +10,8 @@ import { NARRATION as NARRATION_EP02 } from "./src/ep02/narration.ts";
 import { SCENE_DURATIONS as SCENE_DURATIONS_EP02, TRANSITION_DURATION as TRANSITION_EP02 } from "./src/ep02/timing.ts";
 import { NARRATION as NARRATION_EP03 } from "./src/ep03/narration.ts";
 import { SCENE_DURATIONS as SCENE_DURATIONS_EP03, TRANSITION_DURATION as TRANSITION_EP03 } from "./src/ep03/timing.ts";
+import { NARRATION as NARRATION_EP04 } from "./src/ep04/narration.ts";
+import { SCENE_DURATIONS as SCENE_DURATIONS_EP04, TRANSITION_DURATION as TRANSITION_EP04 } from "./src/ep04/timing.ts";
 
 // ─── Episode registry ─────────────────────────────────────────
 
@@ -89,6 +91,26 @@ and waveshaping with tanh — expanding the oscillator's tonal range.`,
     description: `Completing the sound source architecture — a second oscillator
 with transpose and detune, white and pink noise generators,
 and a mixer to blend all three sources into the filter.`,
+  },
+  ep04: {
+    number: 4,
+    title: "The Filter",
+    compositionId: "Ep04-Filter",
+    thumbnailId: null,
+    narration: NARRATION_EP04,
+    sceneDurations: SCENE_DURATIONS_EP04,
+    transitionDuration: TRANSITION_EP04,
+    sceneTitles: [
+      "Intro",
+      "Sallen-Key MS-20",
+      "Filter Gallery",
+      "Filter Routing",
+      "Outro",
+    ],
+    description: `Sculpting sound with filters — eight filter types from warm analog
+to creative effects. Sallen-Key MS-20 with tanh saturation, Cytomic SVF,
+comb, vowel, DJ, and resampling filters, plus per-source routing
+and keyboard tracking.`,
   },
 };
 
