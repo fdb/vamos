@@ -2,11 +2,13 @@ import { writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { NARRATION as NARRATION_EP01 } from "./src/ep01/narration.ts";
 import { NARRATION as NARRATION_EP02 } from "./src/ep02/narration.ts";
 import { NARRATION as NARRATION_EP03 } from "./src/ep03/narration.ts";
+import { NARRATION as NARRATION_EP04 } from "./src/ep04/narration.ts";
 
 const EPISODES: Record<string, typeof NARRATION_EP01> = {
   "1": NARRATION_EP01,
   "2": NARRATION_EP02,
   "3": NARRATION_EP03,
+  "4": NARRATION_EP04,
 };
 
 const episodeArg = process.argv[2];
@@ -43,6 +45,9 @@ const PRONUNCIATION_MAP: Record<string, string> = {
   PolyBLEP: "Poly Blep",
   polyBLEP: "poly blep",
   tanh: "tanch",
+  LFO: "L F O",
+  Cytomic: "Sigh-tomic",
+  SVF: "S V F",
 };
 
 function applyPronunciations(text: string): string {

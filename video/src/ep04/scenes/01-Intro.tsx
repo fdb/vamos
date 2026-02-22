@@ -16,6 +16,17 @@ import { SignalFlowDiagram } from "../../components/SignalFlowDiagram";
 import { SceneNarration } from "../../components/SceneNarration";
 import { NARRATION } from "../narration";
 
+const FILTER_TYPES = [
+  { label: "Sallen-Key I", color: COLORS.CYAN },
+  { label: "Sallen-Key II", color: COLORS.CYAN },
+  { label: "SVF Low-Pass", color: COLORS.GREEN },
+  { label: "SVF High-Pass", color: COLORS.GREEN },
+  { label: "Comb", color: COLORS.AMBER },
+  { label: "Vowel", color: COLORS.PINK },
+  { label: "DJ", color: COLORS.VIOLET },
+  { label: "Resampling", color: COLORS.AMBER },
+];
+
 export const Intro: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -33,19 +44,11 @@ export const Intro: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  // Segment boundary — aligned to narration 03-intro-1 startFrame
-  const SEG0_END = 455;
-
-  // Three sources to preview
-  const sources = [
-    { label: "Oscillator 2", color: COLORS.CYAN },
-    { label: "Noise", color: COLORS.AMBER },
-    { label: "Mixer", color: COLORS.GREEN },
-  ];
+  const SEG0_END = 532;
 
   return (
     <SceneContainer sceneIndex={0} totalScenes={5} showProgressBar={false}>
-      {/* Segment 0: Recap + Preview */}
+      {/* Segment 0: Title + Signal Flow */}
       <Sequence durationInFrames={SEG0_END} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
@@ -66,7 +69,7 @@ export const Intro: React.FC = () => {
               textTransform: "uppercase",
             }}
           >
-            Episode 3 — Noise, Mixer & Osc2
+            Episode 4 — The Filter
           </div>
 
           {/* VAMOS title */}
@@ -95,58 +98,48 @@ export const Intro: React.FC = () => {
               marginTop: -10,
             }}
           >
-            Completing the Sound Sources
+            Sculpting Sound with Filters
           </div>
 
-          {/* Badges */}
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              marginTop: 40,
-              opacity: subtitleOpacity,
-            }}
-          >
-            <Badge label="Osc 2" color={COLORS.CYAN} delay={60} />
-            <Badge label="Noise" color={COLORS.AMBER} delay={70} />
-            <Badge label="Mixer" color={COLORS.GREEN} delay={80} />
-          </div>
-
-          {/* Signal flow — blocks light up as narrator mentions them */}
+          {/* Signal flow — filter lights up as narrator mentions it */}
           <div style={{ position: "absolute", bottom: 120, opacity: subtitleOpacity }}>
             <SignalFlowDiagram
               delay={100}
               activeBlocks={[
                 "osc1",
-                ...(frame >= 220 ? ["osc2"] : []),
-                ...(frame >= 310 ? ["noise"] : []),
-                ...(frame >= 370 ? ["mixer"] : []),
+                "osc2",
+                "noise",
+                "mixer",
+                ...(frame >= 180 ? ["filter"] : []),
               ]}
             />
           </div>
         </AbsoluteFill>
       </Sequence>
 
-      {/* Segment 1: These are simpler but essential */}
-      <Sequence from={SEG0_END} durationInFrames={900 - SEG0_END} premountFor={PREMOUNT_FRAMES}>
+      {/* Segment 1: Eight filter types */}
+      <Sequence from={SEG0_END} durationInFrames={870 - SEG0_END} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          {/* Three source blocks animate in */}
+          {/* Filter type grid */}
           <div
             style={{
               display: "flex",
-              gap: 60,
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 16,
+              maxWidth: 900,
               marginBottom: 60,
             }}
           >
-            {sources.map((src, i) => {
-              const itemDelay = i * 15;
+            {FILTER_TYPES.map((ft, i) => {
+              const itemDelay = 20 + i * 8;
               const itemReveal = spring({
-                frame: frame - SEG0_END - itemDelay,
+                frame: frame - itemDelay,
                 fps,
                 config: SPRING_BOUNCY,
               });
@@ -154,46 +147,34 @@ export const Intro: React.FC = () => {
                 <div
                   key={i}
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                    padding: "14px 24px",
+                    borderRadius: 8,
+                    border: `2px solid ${ft.color}`,
+                    backgroundColor: `${ft.color}12`,
                     opacity: itemReveal,
                     transform: `scale(${itemReveal})`,
+                    boxShadow: `0 0 15px ${ft.color}22`,
                   }}
                 >
-                  <div
+                  <span
                     style={{
-                      width: 160,
-                      height: 80,
-                      borderRadius: 12,
-                      border: `2px solid ${src.color}`,
-                      backgroundColor: `${src.color}15`,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      boxShadow: `0 0 20px ${src.color}33`,
+                      fontFamily: FONT_SANS,
+                      fontSize: 18,
+                      fontWeight: 600,
+                      color: ft.color,
                     }}
                   >
-                    <span
-                      style={{
-                        fontFamily: FONT_SANS,
-                        fontSize: 20,
-                        fontWeight: 600,
-                        color: src.color,
-                      }}
-                    >
-                      {src.label}
-                    </span>
-                  </div>
+                    {ft.label}
+                  </span>
                 </div>
               );
             })}
           </div>
 
-          {/* Signal flow with all sources lit */}
+          {/* Signal flow with filter active */}
           <SignalFlowDiagram
-            delay={SEG0_END + 60}
-            activeBlocks={["osc1", "osc2", "noise", "mixer"]}
+            delay={100}
+            activeBlocks={["osc1", "osc2", "noise", "mixer", "filter"]}
             showPulse
           />
         </AbsoluteFill>
