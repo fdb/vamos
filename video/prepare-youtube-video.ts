@@ -12,6 +12,8 @@ import { NARRATION as NARRATION_EP03 } from "./src/ep03/narration.ts";
 import { SCENE_DURATIONS as SCENE_DURATIONS_EP03, TRANSITION_DURATION as TRANSITION_EP03 } from "./src/ep03/timing.ts";
 import { NARRATION as NARRATION_EP04 } from "./src/ep04/narration.ts";
 import { SCENE_DURATIONS as SCENE_DURATIONS_EP04, TRANSITION_DURATION as TRANSITION_EP04 } from "./src/ep04/timing.ts";
+import { NARRATION as NARRATION_EP05 } from "./src/ep05/narration.ts";
+import { SCENE_DURATIONS as SCENE_DURATIONS_EP05, TRANSITION_DURATION as TRANSITION_EP05 } from "./src/ep05/timing.ts";
 
 // ─── Episode registry ─────────────────────────────────────────
 
@@ -111,6 +113,26 @@ and a mixer to blend all three sources into the filter.`,
 to creative effects. Sallen-Key MS-20 with tanh saturation, Cytomic SVF,
 comb, vowel, DJ, and resampling filters, plus per-source routing
 and keyboard tracking.`,
+  },
+  ep05: {
+    number: 5,
+    title: "Modulators",
+    compositionId: "Ep05-Modulators",
+    thumbnailId: null,
+    narration: NARRATION_EP05,
+    sceneDurations: SCENE_DURATIONS_EP05,
+    transitionDuration: TRANSITION_EP05,
+    sceneTitles: [
+      "Intro",
+      "LFO",
+      "Cycling Envelope",
+      "Modulation Matrix",
+      "Outro",
+    ],
+    description: `Bringing synth parameters to life with modulators — LFO with eight shapes
+for rhythmic effects, cycling envelope with MidPoint asymmetry for looping
+contours, and a modulation matrix routing eight sources to twelve targets
+for dynamic, evolving sound.`,
   },
 };
 
