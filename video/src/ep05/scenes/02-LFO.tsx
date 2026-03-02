@@ -169,10 +169,9 @@ export const LFO: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const SCENE_TOTAL = 1800;
-  // Estimates — updated after TTS
-  const SEG0_END = 500;
-  const SEG1_END = 1100;
+  const SCENE_TOTAL = 1574;
+  const SEG0_END = 412;  // lfo-1 starts here
+  const SEG1_END = 1061; // lfo-2 starts here
 
   return (
     <SceneContainer sceneIndex={1} totalScenes={5}>

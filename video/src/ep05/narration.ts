@@ -15,7 +15,7 @@ export const NARRATION: SceneNarration[] = [
       {
         id: "05-intro-1",
         text: "Vamos has three modulation tools: an LFO for rhythmic motion, a cycling envelope for repeating sweeps, and a mod matrix that routes them anywhere. Let's start with the LFO.",
-        startFrame: 0,
+        startFrame: 482,
       },
     ],
   },
@@ -30,12 +30,12 @@ export const NARRATION: SceneNarration[] = [
       {
         id: "05-lfo-1",
         text: "The interesting shapes are Sample and Hold and Wander. Sample and Hold grabs a new random value each cycle — classic sci-fi bleep sounds. Wander is subtler: it runs random noise through a low-pass filter, so it drifts unpredictably. The filter's cutoff scales with the LFO rate — slow rate means very smooth drift, fast rate means jittery chaos.",
-        startFrame: 0,
+        startFrame: 412,
       },
       {
         id: "05-lfo-2",
         text: "The code is a switch over eight shapes. Most are one-liners: sine is sin of two pi phase, saw is two phase minus one. Wander is the exception — it uses exponential smoothing to filter random noise. Amount scales the output, retrigger resets the phase on each new note.",
-        startFrame: 0,
+        startFrame: 1061,
       },
     ],
   },
@@ -50,7 +50,7 @@ export const NARRATION: SceneNarration[] = [
       {
         id: "05-cycenv-1",
         text: "Three phases: rise, hold, fall. The MidPoint parameter sets where rise ends. Hold keeps the envelope at its peak for a fraction of the cycle. Fall takes whatever time is left. The whole thing is under thirty lines — just a phasor and three if-statements. Vamos can switch between this and a standard ADSR for the second envelope slot.",
-        startFrame: 0,
+        startFrame: 683,
       },
     ],
   },
@@ -65,12 +65,12 @@ export const NARRATION: SceneNarration[] = [
       {
         id: "05-modmatrix-1",
         text: "The mod matrix routes these values to destinations. Filter cutoff has two dedicated mod slots — by default, the cycling envelope drives it with eighty percent depth. Pitch and oscillator shape have their own slots too. Then three general-purpose slots let you route any source to any of twelve targets.",
-        startFrame: 0,
+        startFrame: 549,
       },
       {
         id: "05-modmatrix-2",
         text: "Resolving a target is just a loop: for each slot pointing at this target, multiply the source value by its amount and sum them up. Pitch and filter use exponential scaling because musical intervals are logarithmic. Gains and resonance are linear. You can even modulate the LFO's own rate — that's meta-modulation, where the modulator modulates itself.",
-        startFrame: 0,
+        startFrame: 1140,
       },
     ],
   },

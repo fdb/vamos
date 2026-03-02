@@ -53,12 +53,14 @@ export const CyclingEnvelopeVisualizer: React.FC<CyclingEnvelopeVisualizerProps>
     config: SPRING_SMOOTH,
   });
 
-  // Animated midPoint: sweeps 0 → 0.5 → 1.0 over ~6 seconds (180 frames)
+  // Animated midPoint: sweeps through 0 → 1.0 → 0.5 timed to narration
   const animatedMidPoint = animate
-    ? interpolate(frame - delay, [30, 90, 120, 180], [0.05, 0.5, 0.5, 0.95], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-      })
+    ? interpolate(
+        frame - delay,
+        [0, 200, 240, 370, 410, 560, 600],
+        [0.5, 0.5, 0.05, 0.05, 0.95, 0.95, 0.5],
+        { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+      )
     : midPoint;
 
   const padL = 60;

@@ -39,8 +39,7 @@ export const Intro: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  // Estimate SEG0_END — updated after TTS
-  const SEG0_END = 450;
+  const SEG0_END = 482; // intro-1 starts here
 
   return (
     <SceneContainer sceneIndex={0} totalScenes={5} showProgressBar={false}>
@@ -116,7 +115,7 @@ export const Intro: React.FC = () => {
       </Sequence>
 
       {/* Segment 1: Three modulation tools */}
-      <Sequence from={SEG0_END} durationInFrames={900 - SEG0_END} premountFor={PREMOUNT_FRAMES}>
+      <Sequence from={SEG0_END} durationInFrames={839 - SEG0_END} premountFor={PREMOUNT_FRAMES}>
         <AbsoluteFill
           style={{
             justifyContent: "center",

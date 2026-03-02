@@ -24,10 +24,9 @@ export const ModMatrix: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const SCENE_TOTAL = 1800;
-  // Estimates — updated after TTS
-  const SEG0_END = 530;
-  const SEG1_END = 1100;
+  const SCENE_TOTAL = 1750;
+  const SEG0_END = 549;  // modmatrix-1 starts here
+  const SEG1_END = 1140; // modmatrix-2 starts here
 
   return (
     <SceneContainer sceneIndex={3} totalScenes={5}>

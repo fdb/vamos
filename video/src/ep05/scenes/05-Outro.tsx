@@ -19,7 +19,7 @@ export const Outro: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const SCENE_TOTAL = 700;
+  const SCENE_TOTAL = 643;
 
   const recapItems = [
     "LFO with eight shapes — sine to drifting wander",

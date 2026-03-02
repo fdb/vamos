@@ -24,9 +24,8 @@ export const CyclingEnv: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const SCENE_TOTAL = 1400;
-  // Estimates — updated after TTS
-  const SEG0_END = 700;
+  const SCENE_TOTAL = 1440;
+  const SEG0_END = 683; // cycenv-1 starts here
 
   return (
     <SceneContainer sceneIndex={2} totalScenes={5}>
@@ -63,20 +62,20 @@ export const CyclingEnv: React.FC = () => {
             />
           </div>
 
-          {/* Right: MidPoint explanation */}
+          {/* Right: MidPoint explanation — items staggered to narration */}
           <div style={{ flex: 1 }}>
-            <MidPointComparison delay={40} />
+            <MidPointComparison delay={240} />
 
             <div style={{ marginTop: 24 }}>
               <KeyPoint
                 text="One parameter controls the entire envelope shape"
-                delay={160}
+                delay={560}
                 color={COLORS.GREEN}
               />
             </div>
 
             <div style={{ marginTop: 8 }}>
-              <NeonBox color={COLORS.GREEN} delay={220} width={380}>
+              <NeonBox color={COLORS.GREEN} delay={600} width={380}>
                 <div style={{ fontFamily: FONT_MONO, fontSize: 13, color: COLORS.TEXT_PRIMARY }}>
                   <div style={{ marginBottom: 8, color: COLORS.GREEN, fontWeight: 600 }}>
                     Env2 Mode
@@ -151,17 +150,18 @@ const MidPointComparison: React.FC<{ delay: number }> = ({ delay }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
+  // Ordered to match narration: "At zero… At one… At point five…"
   const items = [
     { value: "0.0", desc: "Instant rise, slow fall", hint: "plucked string", color: COLORS.CYAN },
-    { value: "0.5", desc: "Symmetric", hint: "balanced", color: COLORS.GREEN },
     { value: "1.0", desc: "Slow rise, instant fall", hint: "swell cutoff", color: COLORS.PINK },
+    { value: "0.5", desc: "Symmetric", hint: "balanced", color: COLORS.GREEN },
   ];
 
   return (
     <div>
       {items.map((item, i) => {
         const reveal = spring({
-          frame: frame - delay - i * 20,
+          frame: frame - delay - i * 160,
           fps,
           config: SPRING_SMOOTH,
         });
