@@ -4,12 +4,14 @@ import { Thumbnail } from "./ep01/Thumbnail";
 import { Video as Video02 } from "./ep02/Video";
 import { Video as Video03 } from "./ep03/Video";
 import { Video as Video04 } from "./ep04/Video";
+import { Video as Video05 } from "./ep05/Video";
 import { VideoSchema } from "./types";
 import { FPS, WIDTH, HEIGHT } from "./lib/timing";
 import { TOTAL_DURATION } from "./ep01/timing";
 import { TOTAL_DURATION as TOTAL_DURATION_EP02 } from "./ep02/timing";
 import { TOTAL_DURATION as TOTAL_DURATION_EP03 } from "./ep03/timing";
 import { TOTAL_DURATION as TOTAL_DURATION_EP04 } from "./ep04/timing";
+import { TOTAL_DURATION as TOTAL_DURATION_EP05 } from "./ep05/timing";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -69,6 +71,20 @@ export const RemotionRoot: React.FC = () => {
           title: "VAMOS",
           episode: 4,
           episodeTitle: "The Filter",
+        }}
+      />
+      <Composition
+        id="Ep05-Modulators"
+        component={Video05}
+        durationInFrames={TOTAL_DURATION_EP05}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+        schema={VideoSchema}
+        defaultProps={{
+          title: "VAMOS",
+          episode: 5,
+          episodeTitle: "Modulators",
         }}
       />
     </>

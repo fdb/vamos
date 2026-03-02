@@ -3,12 +3,14 @@ import { NARRATION as NARRATION_EP01 } from "./src/ep01/narration.ts";
 import { NARRATION as NARRATION_EP02 } from "./src/ep02/narration.ts";
 import { NARRATION as NARRATION_EP03 } from "./src/ep03/narration.ts";
 import { NARRATION as NARRATION_EP04 } from "./src/ep04/narration.ts";
+import { NARRATION as NARRATION_EP05 } from "./src/ep05/narration.ts";
 
 const EPISODES: Record<string, typeof NARRATION_EP01> = {
   "1": NARRATION_EP01,
   "2": NARRATION_EP02,
   "3": NARRATION_EP03,
   "4": NARRATION_EP04,
+  "5": NARRATION_EP05,
 };
 
 const episodeArg = process.argv[2];
@@ -48,6 +50,8 @@ const PRONUNCIATION_MAP: Record<string, string> = {
   LFO: "L F O",
   Cytomic: "Sigh-tomic",
   SVF: "S V F",
+  ModContext: "Mod Context",
+  MidPoint: "Mid Point",
 };
 
 function applyPronunciations(text: string): string {
